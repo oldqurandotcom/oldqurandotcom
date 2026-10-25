@@ -74,3 +74,4 @@ keys
 .node/
 screenshots/
 .env.local
+.env*

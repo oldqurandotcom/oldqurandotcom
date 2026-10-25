@@ -1,25 +1,25 @@
-const BASE_OG_URL = 'https://og.qurancdn.com';
+import { getBasePath } from '@/utils/url';
+
+// Quran.com's own preview service (og.qurancdn.com) now renders the new branding,
+// so every link preview uses this clone's static old-style image instead.
+const OG_IMAGE_PATH = '/images/og-old-quran.png';
 
 interface BaseOgOptions {
   locale: string;
 }
 
-export const getDefaultOgImageUrl = ({ locale }: BaseOgOptions) =>
-  `${BASE_OG_URL}/api/og?lang=${locale}`;
+const getOgImageUrl = () => `${getBasePath()}${OG_IMAGE_PATH}`;
 
-export const getAboutTheQuranImageUrl = ({ locale }: BaseOgOptions) =>
-  `${BASE_OG_URL}/api/og/about-the-quran?lang=${locale}`;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getDefaultOgImageUrl = (options: BaseOgOptions) => getOgImageUrl();
 
-export const getChapterOgImageUrl = ({
-  chapterId,
-  locale,
-  verseNumber,
-}: BaseOgOptions & {
-  chapterId: string | number;
-  verseNumber?: string | number;
-}) => {
-  const url = `${BASE_OG_URL}/api/og/chapter/${chapterId}?lang=${locale}`;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getAboutTheQuranImageUrl = (options: BaseOgOptions) => getOgImageUrl();
 
-  if (!verseNumber) return url;
-  return `${url}&verse=${verseNumber}`;
-};
+export const getChapterOgImageUrl = (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  options: BaseOgOptions & {
+    chapterId: string | number;
+    verseNumber?: string | number;
+  },
+) => getOgImageUrl();

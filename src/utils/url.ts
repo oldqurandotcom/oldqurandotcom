@@ -42,10 +42,15 @@ export const navigateToExternalUrl = (url: string) => {
  * @see https://vercel.com/docs/concepts/projects/environment-variables
  * @returns {string}
  */
-export const getBasePath = (): string =>
-  `${process.env.NEXT_PUBLIC_VERCEL_ENV === 'development' ? 'http' : 'https'}://${
+const PRODUCTION_SITE_URL = 'https://oldqurandotcom.vercel.app';
+
+export const getBasePath = (): string => {
+  // NEXT_PUBLIC_VERCEL_URL is the per-deployment URL; links and previews should use the real domain.
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'production') return PRODUCTION_SITE_URL;
+  return `${process.env.NEXT_PUBLIC_VERCEL_ENV === 'development' ? 'http' : 'https'}://${
     process.env.NEXT_PUBLIC_VERCEL_URL
   }`;
+};
 
 /**
  * Get the auth api path.

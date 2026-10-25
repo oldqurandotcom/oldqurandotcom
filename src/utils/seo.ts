@@ -7,7 +7,7 @@ import { getDefaultOgImageUrl } from '@/lib/og';
 import { VersesResponse } from 'types/ApiResponses';
 
 export const config = {
-  siteName: 'Quran.com',
+  siteName: 'Old Quran.com (unofficial)',
   twitterHandle: '@app_quran',
   twitterCardType: 'summary_large_image',
   facebookApp: '342185219529773',
@@ -33,7 +33,6 @@ export interface SEOProps extends NextSeoProps {
   dangerouslySetAllPagesToNoIndex?: boolean;
 }
 
-const isProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
 export function createSEOConfig({
   title,
   description,
@@ -45,10 +44,11 @@ export function createSEOConfig({
   return {
     title: seoTitle,
     description,
-    titleTemplate: '%s - Quran.com',
+    titleTemplate: '%s - Old Quran.com (unofficial)',
     defaultTitle: config.siteName,
-    dangerouslySetAllPagesToNoFollow: !isProduction, // @see https://github.com/garmeeh/next-seo#dangerouslySetAllPagesToNoFollow
-    dangerouslySetAllPagesToNoIndex: !isProduction, // @see https://github.com/garmeeh/next-seo#dangerouslySetAllPagesToNoIndex
+    // unofficial clone: keep every page out of search results
+    dangerouslySetAllPagesToNoFollow: true,
+    dangerouslySetAllPagesToNoIndex: true,
     canonical: canonicalUrl,
     openGraph: {
       type: 'website',
@@ -67,19 +67,11 @@ export function createSEOConfig({
       // eslint-disable-next-line @typescript-eslint/naming-convention
       site_name: config.siteName,
     },
-    facebook: {
-      appId: config.facebookApp,
-    },
+    // no Quran.com Facebook/Twitter IDs: this clone isn't theirs
     twitter: {
-      handle: config.twitterHandle,
-      site: config.twitterHandle,
       cardType: config.twitterCardType,
     },
     additionalMetaTags: [
-      {
-        property: 'fb:pages',
-        content: config.facebookPage,
-      },
       // {
       //   name: 'al:ios:url',
       //   content: config.appleAppUrl,

@@ -1,0 +1,366 @@
+{
+    "about": "درباره ما",
+    "and": "و",
+    "announcements": {
+        "auth-onboarding": {
+            "data-sync": {
+                "action": "بعد",
+                "description": "چه از Quran.com در تلفن یا لپ تاپ خود استفاده می کنید، نشانک ها، آخرین آیات خوانده شده و تنظیمات برگزیده شما در دسترس خواهند بود.",
+                "title": "داده‌های شما <br> <\/br> در بین دستگاه‌ها همگام‌سازی خواهند شد"
+            },
+            "feedback": {
+                "action": "باشه فهمیدم",
+                "description": "از اینکه از Quran.com استفاده کردید متشکریم و خوشحال می شویم نظرات شما را در مورد <link> feedback.quran.com <\/link> بشنویم",
+                "title": "ما می خواهیم افکار شما را بشنویم"
+            },
+            "quran-foundation-link": {
+                "action": "بعد",
+                "description": "از لاگین Quran.com خود برای دسترسی به QuranReflect.com استفاده کنید - یک جامعه جهانی پر رونق که درگیر تفکر قرآنی است.",
+                "title": "از حساب خود در برنامه های Quran.Foundation استفاده کنید!"
+            },
+            "quran-growth-journey": {
+                "action": "بعد",
+                "description": "خط قرائت قرآن خود را حفظ کنید و در اهداف خود پیشرفت کنید و در عین حال عادت های جدید ایجاد کنید",
+                "title": "سفر رشد قرآن خود را آغاز کنید!"
+            },
+            "welcome": {
+                "action": "ببینید چه چیز جدیدی است",
+                "title": "به حساب کاربری <br> <\/br> خوش آمدید"
+            }
+        },
+        "collections-announcement": {
+            "slide-1": {
+                "description": "ما بسیار خوشحالیم که اعلام کنیم اکنون می توانید نشانک ها را در زیر \"مجموعه ها\" گروه بندی کنید! <br\/> <br\/> <li> هر تعداد مجموعه را که می خواهید اضافه کنید <\/li> <li> یک نشانک به یک یا چند مجموعه اضافه کنید <\/li> <li> و موارد دیگر! <\/li>",
+                "title": "مجموعه نشانک ها اینجا هستند!"
+            }
+        }
+    },
+    "aria": {
+        "change-settings": "تغییر تنظیمات",
+        "drawer-close": "کشو را ببندید",
+        "msg-close": "بستن پیام",
+        "nav-drawer-open": "کشوی پیمایش را باز کنید",
+        "play-surah": "پخش سوره {{surahName}}",
+        "select-lng": "زبان را انتخاب کنید",
+        "sidebar-nav-close": "نوار کناری ناوبری را ببندید"
+    },
+    "audio": {
+        "auto-scroll": {
+            "off": "خاموش",
+            "on": "بر",
+            "title": "اسکرول خودکار"
+        },
+        "displaying": "در حال نمایش",
+        "exp-tip": "<span>تغییر محتوای نمایش داده شده در<\/span><br><\/br> <boldSpan>تنظیمات<\/boldSpan> > <boldSpan>کلمه به کلمه<\/boldSpan>",
+        "exp-tip-no-select": "<span>گزینه نمایش راهنمای راهنمای ابزار را علامت بزنید و گزینه <br><\/br> ترجمه و\/یا نویسه‌گردانی را انتخاب کنید<\/span><br><\/br><span> در <\/span><boldSpan>تنظیمات<\/boldSpan> > <boldSpan>کلمه به کلمه<\/boldSpan><span>, تا<\/span><br><\/br> <span>این ویژگی را فعال کنید.<\/span>",
+        "experience": "تجربه",
+        "play": "پخش صدا",
+        "playback-normal": "طبیعی",
+        "playback-speed": "سرعت پخش",
+        "playback-speed-unit": "ایکس",
+        "player": {
+            "close-audio-player": "پخش کننده صوتی را ببندید",
+            "currently-playing": "شما در حال حاضر در حال بازی هستید",
+            "delay-verse": "تأخیر بین آیه",
+            "download": "دانلود",
+            "full-surah": "سوره کامل",
+            "manage-repeat-settings": "تنظیمات تکرار را مدیریت کنید",
+            "mismatch": "اگر می خواهید به جای آن {{currentReadingChapter}} را بازی کنید، روی \"شروع دوباره\" کلیک کنید",
+            "pause": "مکث کنید",
+            "pause-audio": "مکث صدا",
+            "play": "بازی",
+            "play-audio": "پخش صدا",
+            "play-range": "محدوده بازی",
+            "previous-ayah": "آیه قبلی",
+            "repeat-1-verse": "آیه را تکرار کن",
+            "repeat-settings": "تنظیمات را تکرار کنید",
+            "repeat-verse": "هر آیه را تکرار کنید",
+            "search-verse": "جستجوی یک آیه",
+            "single-verse": "تک آیه",
+            "start-over": "شروع دوباره",
+            "start-playing": "شروع به بازی کنید",
+            "stop-repeating": "تکرار را متوقف کنید",
+            "times": "بار",
+            "verses-range": "طیف آیات"
+        },
+        "repeat-moved": "تنظیمات تکرار به پخش کننده صدا منتقل شده است. برای دسترسی به آنها روی نماد <0> <\/0> کلیک کنید",
+        "select-reciter": "خواننده را انتخاب کنید",
+        "speed": "سرعت",
+        "title": "سمعی"
+    },
+    "ayah": "آیه",
+    "ayahs": "آیات",
+    "beta": "بتا",
+    "bookmark": "نشانک",
+    "bookmarked": "نشانک گذاری شده است",
+    "both": "هر دو",
+    "cancel": "لغو کنید",
+    "click-here": "اینجا کلیک کنید",
+    "close": "نزدیک",
+    "command-bar": {
+        "navigations": "ناوبری ها",
+        "no-nav-results": "هیچ نتیجه ناوبری وجود ندارد",
+        "placeholder": "میخواهی چی بخوانی؟",
+        "powered-by": "جستجوی صوتی ارائه شده توسط Tarteel.ai",
+        "recent-navigations": "پیمایش های اخیر",
+        "search-by-voice": "جستجوی صوتی",
+        "try-navigating": "سعی کنید به"
+    },
+    "community": {
+        "cta": "به انجمن بپیوندید",
+        "header": "به انجمن سازندگان و فناوران مسلمان QDC بپیوندید.",
+        "sub-header": "برای مشارکت و همکاری با انجمن پیشرو در ساخت فناوری اسلامی، در Discord Quran.com ثبت نام کنید.",
+        "title": "انجمن"
+    },
+    "complete-sign-up": "ثبت نام خود را تکمیل کنید",
+    "continue": "ادامه هید",
+    "copied": "کپی شده است",
+    "copied-to-clipboard": "در کلیپ بورد کپی شد",
+    "copy": "کپی",
+    "counter": {
+        "decrease": "نزول کردن",
+        "increase": "افزایش دادن"
+    },
+    "default-description": "قرآن در یک رابط کاربری ساده و آسان به بسیاری از زبان ها ترجمه شده است",
+    "developers": "توسعه دهندگان",
+    "display": "نمایش دادن",
+    "donate": "اهدا کنید",
+    "donate_monthly": "ماهانه اهدا کنید",
+    "donate_once": "یکبار اهدا کنید",
+    "email-verification": {
+        "check-spam": "ایمیل تأیید را دریافت نکردید؟ صندوق ورودی هرزنامه خود را بررسی کنید",
+        "email-sent": "ما همین الان یک ایمیل به <strong> {{email}} <\/strong> ارسال کردیم",
+        "email-verification": "تایید ایمیل",
+        "resend-email": "ایمیل را دوباره ارسال کن",
+        "resend-email-in": "ارسال مجدد ایمیل تأیید در {{remainingTime}} ثانیه...",
+        "verify-code": "کد را تأیید کنید"
+    },
+    "error": {
+        "bookmark-sync": "نشانک همگام نیست.",
+        "email-login-fail": "با ایمیل وارد نشد. لطفا دوباره تلاش کنید",
+        "general": "مشکلی پیش آمد. لطفا دوباره تلاش کنید.",
+        "offline": "به نظر می رسد ارتباط خود را از دست داده اید. لطفاً آن را بررسی کنید و دوباره امتحان کنید.",
+        "pref-persist-fail": "همگام سازی تنظیمات شما با ابر انجام نشد."
+    },
+    "feedback": "بازخورد",
+    "fonts": {
+        "15_lines": "15 خط",
+        "16_lines": "16 خط",
+        "code_v1": "مجتمع شاه فهد V1",
+        "code_v2": "مجتمع شاه فهد V2",
+        "font-size": "اندازه فونت",
+        "lines": "خطوط",
+        "qcf-desc": "فونت‌های مجتمع شاه فهد (V1 و V2) کیفیت بالاتری را ارائه می‌دهند، اما بارگذاری طولانی‌تر طول می‌کشد.",
+        "qpc_uthmani_hafs": "QPC عثمانی حفص",
+        "quran-font": "فونت قرآن",
+        "tajweed": "تجوید",
+        "tajweed-desc": "فونت تجوید مصحف رنگی تجوید را نشان می دهد. می توانید اطلاعات بیشتری در مورد قوانین رنگ تجوید <0> در اینجا <\/0>",
+        "text_indopak": "IndoPak",
+        "text_uthmani": "عثمانی"
+    },
+    "footer": {
+        "description": "Quran.com یک جریه صدقه است. امیدواریم بتوانیم خواندن، مطالعه و یادگیری قرآن کریم را برای همگان آسان کنیم. قرآن کریم دارای نام های فراوانی از جمله القرآن الکریم، الکتاب، الفرقان، الماویثه، الذکر و النور است.",
+        "rights": "تمامی حقوق محفوظ است",
+        "title": "قرآن کریم را بخوانید، مطالعه کنید و یاد بگیرید."
+    },
+    "form": {
+        "code": "کد تایید",
+        "email": "پست الکترونیک",
+        "firstName": "نام کوچک",
+        "lastName": "نام خانوادگی"
+    },
+    "from": "از جانب",
+    "fundraising-sticky-banner": {
+        "cta": "اهدا کنید",
+        "title": "ماه رمضان امسال از Quran.com حمایت کنید"
+    },
+    "fundraising": {
+        "description": "کمک‌های ماهانه به ما کمک می‌کند تا Quran.com را بهبود بخشیم و عملیات‌ها را حفظ کنیم، بنابراین کمتر روی جمع‌آوری کمک‌های مالی و بیشتر بر ایجاد تأثیر تمرکز می‌کنیم.",
+        "title": "یک اهدا کننده ماهانه شوید"
+    },
+    "help": "کمک",
+    "hizb": "حزب",
+    "home": "صفحه اصلی",
+    "hours": "ساعت ها",
+    "inline": "در خط",
+    "input": {
+        "clear": "پاک کردن"
+    },
+    "juz": "جوز",
+    "language": "زبان",
+    "languages": "زبان ها",
+    "learn-more": "بیشتر بدانید",
+    "less": "کمتر",
+    "loading": "بارگذاری",
+    "login": "وارد شدن",
+    "logout": "خروج",
+    "meccan": "مکه",
+    "medinan": "مدینه",
+    "menu": "منو",
+    "minutes": "دقایق",
+    "mobile-apps": "برنامه های موبایل",
+    "mode": "حالت",
+    "more": "بیشتر",
+    "navigate": "پیمایش کنید",
+    "network": "شبکه",
+    "new": "جدید!",
+    "next": "بعد",
+    "next-ayah": "آیه بعدی",
+    "no": "خیر",
+    "none": "هیچ یک",
+    "off": "خاموش",
+    "on": "بر",
+    "page": "صفحه",
+    "pages": "صفحات",
+    "pagination-summary": "{{currentResultNumber}} - {{endOfResultNumber}} از {{totalNumberOfResults}} نتایج جستجو",
+    "pbuh": "درود خدا بر او باد",
+    "popular-links": "لینک های محبوب",
+    "popup": {
+        "footnote": "کمک های مالی ماهانه به ما امکان می دهد کمتر روی جمع آوری کمک های مالی تمرکز کنیم",
+        "text-1": "ما متعهد هستیم که همواره به صورت رایگان به دانش و فناوری قرآنی جهان خدمت کنیم.",
+        "text-2": "قرآن دات کام فرصت مناسبی برای صدقه مستمر (صدقه جاریه) است. لطفاً سرمایه گذاری در آخرت خود را به عنوان یک اهدا کننده ماهانه (یا یک بار) در نظر بگیرید.",
+        "title": "یاران گرامی قرآن"
+    },
+    "powered-by": "پشتیبانی شده توسط",
+    "prev": "قبلی",
+    "previous-ayah": "آیه قبلی",
+    "privacy": "حریم خصوصی",
+    "product-updates": "به روز رسانی محصول",
+    "profile": "مشخصات",
+    "q-reflect": "قرآن انعکاس",
+    "quran-com": "قرآن دات کام",
+    "quran-radio": "رادیو قرآن",
+    "reading-history": "خواندن تاریخ",
+    "reading-preference": {
+        "reading": "خواندن",
+        "translation": "ترجمه"
+    },
+    "recitation": "بازگو کردن",
+    "reciter": "قاری",
+    "reciter-summary": "کلمه به کلمه تلاوت کننده: <span> {{reciterName}} <\/span> . برای گوش دادن به تلاوت آن کلمه، روی آن کلیک کنید.",
+    "reciters": "قاریان",
+    "reflect": "منعکس کنید",
+    "remove": "برداشتن",
+    "rename": "تغییر نام دهید",
+    "retry": "دوباره امتحان کنید",
+    "revelation_order": "دستور وحی",
+    "rub": "روب الحزب",
+    "save-to-collection": "ذخیره در مجموعه",
+    "search-for": "جستجوی \"{{searchQuery}}\"",
+    "search-results": "{{count}} نتایج جستجو",
+    "search": {
+        "filters": "فیلترها",
+        "hint": "سعی کنید جستجو کنید",
+        "jump-to": "پرش به",
+        "no-results": "نتیجه ای پیدا نشد",
+        "no-results-suggestion": "هیچ نتیجه جستجوی منطبقی برای \" {{searchQuery}} \" پیدا نکردیم. سعی کنید کلمه کلیدی دیگری را جستجو کنید.",
+        "popular": "جستجوهای محبوب",
+        "recent": "تحقیقات اخیر",
+        "results": "نتایج",
+        "show-all": "نمایش همه نتایج",
+        "switch-mode": "به جستجوی پیشرفته بروید",
+        "title": "جستجو کردن"
+    },
+    "seconds": "ثانیه ها",
+    "settings": {
+        "no-tafsir-selected": "هیچ تفسیری انتخاب نشده است",
+        "no-translation-selected": "ترجمه ای انتخاب نشده است",
+        "reading-experience": "تجربه خواندن",
+        "reset-cta": "تنظیمات را بازنشانی کنید",
+        "reset-notif": "تنظیمات شما به تنظیمات پیش فرض بازنشانی شده است",
+        "search-reciter": "جستجوی قاری",
+        "search-tafsirs": "جستجو در تفاسیر",
+        "search-translations": "جستجوی ترجمه ها",
+        "selected-reciter": "قاری برگزیده",
+        "selected-tafsirs": "منتخب تفاسیر",
+        "selected-translations": "ترجمه های برگزیده",
+        "show-tooltip-when-playing-audio": "نمایش راهنمای ابزار هنگام پخش صدا",
+        "title": "تنظیمات",
+        "tooltip-playing-audio-helper": "نمایش ترجمه کلمه در راهنمای ابزار هنگام پخش ayah",
+        "value-and-other": "{{value}} و {{othersCount}} دیگر",
+        "value-and-others": "{{value}} و {{othersCount}} دیگر",
+        "wbw-helper": "ترجمه یا نویسه‌گردانی را مستقیماً زیر کلمه نمایش دهید",
+        "word-tooltip-helper": "نمایش ترجمه یا نویسه‌گردانی هنگام نگه‌داشتن روی کلمه یا کلیک کردن روی آن"
+    },
+    "share": "اشتراک گذاری",
+    "shared": "پیوند در کلیپ بورد کپی شده است!",
+    "sidebar": {
+        "search-hizb": "جستجو در حزب",
+        "search-juz": "جستجوی Juz",
+        "search-page": "صفحه جستجو",
+        "search-surah": "جستجو در سوره",
+        "try-navigating-with": "نکته: سعی کنید با آن پیمایش کنید"
+    },
+    "sitemap": "نقشه سایت",
+    "sort": {
+        "ascending": "صعودی",
+        "by": "مرتب سازی بر اساس",
+        "descending": "نزولی"
+    },
+    "style": "سبک",
+    "submit": "ارسال",
+    "surah": "سوره",
+    "tafsir": {
+        "font-size": "اندازه فونت تفسیر",
+        "group-message": "شما در حال خواندن تفسیری برای گروه آیات {{from}} تا {{to}}",
+        "no-text": "{{tafsirName}} برای آیه فعلی موجود نیست.",
+        "surah": "سوره تفسیر",
+        "tafsir-desc": "آیه {{verseNumber}} {{tafsirName}} {{surahName}}",
+        "tafsirs-desc": "تفسیرهای مختلف آیات {{ayahNumber}} سوره {{surahName}} توسط تفسیرگران مورد اعتماد را بخوانید.",
+        "title": "تفسیر"
+    },
+    "tarteel": {
+        "app": "اپلیکیشن تارتیل",
+        "name": "Tarteel.ai"
+    },
+    "theme": "موضوع",
+    "themes": {
+        "auto": "خودکار",
+        "dark": "تاریک",
+        "light": "سبک",
+        "sepia": "سپیا",
+        "system": "سیستم",
+        "system-desc": "تم سیستم به طور خودکار با تنظیمات حالت روشن\/تاریک شما سازگار می شود"
+    },
+    "to": "به",
+    "tooltip": "راهنمای ابزار",
+    "tooltip-trans-lang": "زبان راهنمای ابزار",
+    "trans-lang": "زبان ترجمه",
+    "translation": "ترجمه",
+    "translations": "ترجمه ها",
+    "transliteration": "نویسه گردانی",
+    "type": "تایپ کنید",
+    "undo": "واگرد",
+    "validation": {
+        "invalid-email": "{{field}} باید یک آدرس ایمیل معتبر باشد",
+        "invalid-field": "لطفاً یک مقدار معتبر {{field}} وارد کنید",
+        "required-field": "{{field}} لازم است"
+    },
+    "verse": "آیه",
+    "verse-bookmark-removed": "نشانک آیه حذف شد!",
+    "verse-bookmarked": "آیه نشانه گذاری شد!",
+    "verses": "آیات",
+    "view": "چشم انداز",
+    "voice": {
+        "ask-permission": "لطفاً مجوز میکروفون را برای شروع استفاده از جستجوی صوتی فعال کنید",
+        "error": "خطایی رخ داده است، لطفاً بعداً دوباره امتحان کنید. یا دانلود کنید",
+        "no-permission": "به نظر می رسد مجوز میکروفون را فعال ندارید. لطفاً مجوزهای میکروفون را فعال کنید و دوباره امتحان کنید یا آن را دانلود کنید",
+        "not-supported": "به نظر می رسد مرورگر شما از میکروفون پشتیبانی نمی کند. لطفاً مرورگر دیگری را امتحان کنید یا آن را دانلود کنید",
+        "suggest": "لطفا شروع به تلاوت کنید و آیه شما ظاهر می شود.",
+        "suggest-subtitle": "هر آیه ای را به زبان عربی بخوانید، آیه ظاهر می شود",
+        "suggest-title": "الان بخون",
+        "voice-search-powered-by": "جستجوی صوتی ارائه شده توسط"
+    },
+    "wbw": "کلمه به کلمه",
+    "wbw-lang-summary": "منبع ترجمه کلمه به کلمه: <link> {{source}} <\/link> . این منبع مستقل از انتخاب ترجمه آیات است.",
+    "wbw-trans-lang": "زبان کلمه به کلمه",
+    "wbw-translation": "ترجمه کلمه به کلمه",
+    "wbw-transliteration": "نویسه گردانی کلمه به کلمه",
+    "word-click": {
+        "no-audio": "بی صدا",
+        "play-audio": "پخش صدا",
+        "title": "کلمه کلیک کنید"
+    },
+    "word-tooltip": "نکته ابزار Word",
+    "yes": "آره"
+}

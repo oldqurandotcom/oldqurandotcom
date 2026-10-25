@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:https": "node server.js",
-    "build": "next build",
-    "postbuild": "yarn run generate-sitemap",
+    "build": "NODE_OPTIONS=--max-old-space-size=6144 next build",
     "snapshots:update": "vitest run --update",
     "start": "next start",
     "storybook": "start-storybook -s public -p 6006",
@@ -154,5 +153,8 @@
   "lint-staged": {
     "*.{tsx,ts}": "yarn lint:fix",
     "*.scss": "yarn lint:scss"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }

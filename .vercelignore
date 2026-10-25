@@ -1,0 +1,14 @@
+# not needed on the host: page fonts load from static.qurancdn.com, the rest is local tooling
+public/fonts/quran/hafs/v1
+public/fonts/quran/hafs/v2
+.node
+screenshots
+start.command
+.storybook
+tests
+.env.local
+.env*.local
+node_modules
+.next
+.git
+.vercel

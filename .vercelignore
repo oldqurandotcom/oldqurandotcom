@@ -4,8 +4,6 @@ public/fonts/quran/hafs/v2
 .node
 screenshots
 start.command
-.storybook
-tests
 .env.local
 .env*.local
 node_modules

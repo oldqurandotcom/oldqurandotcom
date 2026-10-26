@@ -12,6 +12,7 @@ import SettingsDrawer from '../SettingsDrawer/SettingsDrawer';
 
 import styles from './NavbarBody.module.scss';
 
+import MiniMushafButton from '@/components/MiniMushaf/MiniMushafButton';
 import Button, { ButtonShape, ButtonVariant } from '@/dls/Button/Button';
 import IconMenu from '@/icons/menu.svg';
 import IconSearch from '@/icons/search.svg';
@@ -80,6 +81,7 @@ const NavbarBody: React.FC = () => {
                 <InAppNotifications />
               </NotificationsProvider>
             )}
+            <MiniMushafButton />
             <LanguageSelector />
             <Button
               tooltip={t('settings.title')}

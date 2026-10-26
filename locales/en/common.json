@@ -70,6 +70,7 @@
             "pause-audio": "Pause Audio",
             "play": "Play",
             "play-audio": "Play Audio",
+            "loop-until-stopped": "Loop until I stop",
             "play-range": "Play range",
             "previous-ayah": "Previous Ayah",
             "repeat-1-verse": "Repeat Verse",

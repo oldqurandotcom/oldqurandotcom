@@ -9,6 +9,7 @@ import RepeatSetting from './RepeatSetting';
 import SelectRepetitionMode, { RepetitionMode } from './SelectRepetitionMode';
 
 import { RangeVerseItem } from '@/components/Verse/AdvancedCopy/SelectorContainer';
+import Checkbox from '@/dls/Forms/Checkbox/Checkbox';
 import Modal from '@/dls/Modal/Modal';
 import Separator from '@/dls/Separator/Separator';
 import usePersistPreferenceGroup from '@/hooks/auth/usePersistPreferenceGroup';
@@ -83,8 +84,9 @@ const RepeatAudioModal = ({
   );
 
   const [verseRepetition, setVerseRepetition] = useState({
-    repeatRange: repeatSettings?.repeatSettings?.totalRangeCycle ?? 2,
-    repeatEachVerse: repeatSettings?.repeatSettings?.totalVerseCycle ?? 2,
+    // default: loop the selection until the listener stops it, each verse once
+    repeatRange: repeatSettings?.repeatSettings?.totalRangeCycle ?? Infinity,
+    repeatEachVerse: repeatSettings?.repeatSettings?.totalVerseCycle ?? 1,
     from: selectedVerseKey ?? firstVerseKeyInThisChapter,
     to: selectedVerseKey ?? lastVerseKeyInThisChapter,
     delayMultiplier: repeatSettings?.delayMultiplier ?? 1,
@@ -156,6 +158,12 @@ const RepeatAudioModal = ({
     setVerseRepetition({ ...verseRepetition, repeatRange: val });
   };
 
+  const isLoopingUntilStopped = verseRepetition.repeatRange === Infinity;
+  const onLoopUntilStoppedChange = (checked: boolean) => {
+    logValueChange('repeat_loop_until_stopped', isLoopingUntilStopped, checked);
+    setVerseRepetition({ ...verseRepetition, repeatRange: checked ? Infinity : 2 });
+  };
+
   const onRepeatEachVerseChange = (val) => {
     logValueChange('repeat_verse', verseRepetition.repeatEachVerse, val);
     setVerseRepetition({ ...verseRepetition, repeatEachVerse: val });
@@ -187,14 +195,24 @@ const RepeatAudioModal = ({
           <div className={styles.separator}>
             <Separator />
           </div>
-          <RepeatSetting
-            label={t('audio.player.play-range')}
-            value={verseRepetition.repeatRange}
-            minValue={1}
-            infinityThreshold={8}
-            onChange={onRepeatRangeChange}
-            suffix={t('audio.player.times')}
-          />
+          <div className={styles.loopUntilStopped}>
+            <Checkbox
+              id="loop-until-stopped"
+              checked={isLoopingUntilStopped}
+              onChange={onLoopUntilStoppedChange}
+              label={t('audio.player.loop-until-stopped', {}, { default: 'Loop until I stop' })}
+            />
+          </div>
+          {!isLoopingUntilStopped && (
+            <RepeatSetting
+              label={t('audio.player.play-range')}
+              value={verseRepetition.repeatRange}
+              minValue={1}
+              infinityThreshold={8}
+              onChange={onRepeatRangeChange}
+              suffix={t('audio.player.times')}
+            />
+          )}
           <RepeatSetting
             label={t('audio.player.repeat-verse')}
             value={verseRepetition.repeatEachVerse}

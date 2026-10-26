@@ -38,7 +38,7 @@ const Link: React.FC<LinkProps> = ({
   onClick,
   shouldPassHref,
   isShallow = false,
-  shouldPrefetch = true,
+  shouldPrefetch = false, // don't download pages in the background just because their link is on screen
   title,
   ariaLabel,
 }) => (

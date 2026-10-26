@@ -17,7 +17,7 @@ const ChapterBlock: React.FC<Props> = ({ chapter }: Props) => {
   const { t } = useTranslation('common');
   return (
     <div key={chapter.id} className={styles.item}>
-      <Link as={`/${chapter.id}`} href="/[chapterId]" passHref>
+      <Link as={`/${chapter.id}`} href="/[chapterId]" passHref prefetch={false}>
         <a className={styles.link}>
           <div className={styles.container}>
             <div className={classNames(styles.leftContainer, styles.sectionContainer)}>

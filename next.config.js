@@ -7,30 +7,16 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 const withPlugins = require('next-compose-plugins');
 const withFonts = require('next-fonts');
-const withPWA = require('next-pwa');
 const nextTranslate = require('next-translate');
 
 const securityHeaders = require('./configs/SecurityHeaders.js');
-const runtimeCaching = require('./pwa-runtime-config.js');
 
 const isDev = process.env.NEXT_PUBLIC_VERCEL_ENV === 'development';
-const isProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
 const config = {
   productionBrowserSourceMaps: false, // {@see https://nextjs.org/docs/advanced-features/source-maps}
   images: {
     formats: ['image/avif', 'image/webp'],
     domains: ['cdn.qurancdn.com', 'static.qurancdn.com', 'vercel.com', 'now.sh', 'quran.com'],
-  },
-  pwa: {
-    disable: !isProduction,
-    dest: 'public',
-    mode: isProduction ? 'production' : 'development',
-    runtimeCaching,
-    publicExcludes: [
-      '!fonts/**/!(sura_names|ProximaVara)*', // exclude pre-caching all fonts that are not sura_names or ProximaVara
-      '!icons/**', // exclude all icons
-      '!images/**/!(background|homepage)*', // don't pre-cache except background.jpg and homepage.png
-    ],
   },
   // this is needed to support importing audioWorklet nodes. {@see https://github.com/webpack/webpack/issues/11543#issuecomment-826897590}
   webpack: (webpackConfig) => {
@@ -166,6 +152,7 @@ const config = {
 
 module.exports = withPlugins(
   // Sentry is dropped: there is no Sentry project to upload source maps to.
-  [withBundleAnalyzer, withPWA, withFonts, nextTranslate],
+  // next-pwa is dropped too: it made every first visit download ~3 MB of every page's code.
+  [withBundleAnalyzer, withFonts, nextTranslate],
   config,
 );

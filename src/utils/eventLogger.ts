@@ -3,7 +3,6 @@
 
 import SearchQuerySource from '@/types/SearchQuerySource';
 import SearchType from '@/types/SearchType';
-import { isFirebaseEnabled } from 'src/lib/firebase';
 
 /**
  * Filter out empty search queries.
@@ -19,14 +18,9 @@ const getSearchQuery = (rawSearchQuery: string): string => {
   return rawSearchQuery.trim();
 };
 
-export const logEvent = async (eventName: string, params?: { [key: string]: any }) => {
-  if (isFirebaseEnabled) {
-    import('src/lib/firebase').then((firebaseModule) => {
-      // eslint-disable-next-line i18next/no-literal-string
-      firebaseModule.analytics().logEvent(eventName, params);
-    });
-  }
-};
+// No analytics in this copy: events are dropped, and the Firebase library is no longer bundled.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const logEvent = async (eventName: string, params?: { [key: string]: any }) => undefined;
 
 /**
  * Log when a button is clicked.

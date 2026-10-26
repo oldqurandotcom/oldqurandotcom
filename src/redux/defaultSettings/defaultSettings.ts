@@ -10,6 +10,7 @@ import ThemeType from '@/redux/types/ThemeType';
 import TranslationsSettings from '@/redux/types/TranslationsSettings';
 import {
   ReadingPreference,
+  WordByWordType,
   WordClickFunctionality,
   MushafLines,
   QuranFont,
@@ -64,10 +65,10 @@ const QURAN_READER_STYLES_INITIAL_STATE: QuranReaderStyles = {
 const DEFAULT_WBW_LOCALE = 'en';
 
 const READING_PREFERENCES_INITIAL_STATE: ReadingPreferences = {
-  readingPreference: ReadingPreference.Reading, // this copy is Arabic-only: no translation view
+  readingPreference: ReadingPreference.Translation,
   selectedWordByWordLocale: DEFAULT_WBW_LOCALE,
   isUsingDefaultWordByWordLocale: true,
-  wordByWordContentType: [], // no English word-by-word meanings either
+  wordByWordContentType: [WordByWordType.Translation],
   wordByWordDisplay: [WordByWordDisplay.TOOLTIP],
   wordClickFunctionality: WordClickFunctionality.PlayAudio,
 };

@@ -230,8 +230,10 @@ export default {
       wordByWordFontScale: initialState.quranReaderStyles.wordByWordFontScale,
     },
   }),
-  31: (state) => ({
-    // Arabic-only: reading mode, and no English word-by-word meanings
+  // 31 briefly made the site Arabic-only; it's kept as a no-op so the numbering stays intact.
+  31: (state) => state,
+  32: (state) => ({
+    // bring back the translation view and word-by-word meanings that 31 switched off
     ...state,
     readingPreferences: {
       ...state.readingPreferences,

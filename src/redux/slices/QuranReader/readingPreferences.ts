@@ -18,11 +18,9 @@ export const readingPreferencesSlice = createSlice({
   name: SliceName.READING_PREFERENCES,
   initialState: getReadingPreferencesInitialState(),
   reducers: {
-    // this copy is Arabic-only, so whatever asks for another mode stays in reading mode
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setReadingPreference: (state, action: PayloadAction<ReadingPreference>) => ({
       ...state,
-      readingPreference: ReadingPreference.Reading,
+      readingPreference: action.payload,
     }),
     setSelectedWordByWordLocale: (
       state,

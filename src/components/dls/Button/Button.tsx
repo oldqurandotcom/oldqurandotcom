@@ -80,7 +80,7 @@ const Button: React.FC<ButtonProps> = ({
   hasSidePadding = true,
   shouldFlipOnRTL = true,
   shouldShallowRoute: shallowRouting = false,
-  shouldPrefetch: prefetch = false,
+  shouldPrefetch: prefetch = true,
   isNewTab: newTab,
   ariaLabel,
   htmlType,

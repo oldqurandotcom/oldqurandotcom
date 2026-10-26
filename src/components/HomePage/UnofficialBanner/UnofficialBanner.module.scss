@@ -4,8 +4,7 @@
   align-items: center;
   justify-content: center;
   padding-block: var(--spacing-xsmall);
-  padding-inline-start: var(--spacing-medium);
-  padding-inline-end: calc(var(--spacing-mega) + var(--spacing-xsmall));
+  padding-inline: var(--spacing-medium);
   background-color: var(--color-background-elevated);
   border-block-end: 1px solid var(--color-borders-hairline);
   color: var(--color-text-default);
@@ -29,9 +28,3 @@
   }
 }
 
-.closeIcon {
-  position: absolute;
-  inset-inline-end: var(--spacing-xsmall);
-  inset-block-start: 50%;
-  transform: translateY(-50%);
-}

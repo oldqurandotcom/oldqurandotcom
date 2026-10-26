@@ -326,6 +326,13 @@ export const audioPlayerMachine =
                             'User either clicks on the pause button or presses the space key',
                           target: '#audioPlayer.VISIBLE.AUDIO_PLAYER_INITIATED.PAUSED.ACTIVE',
                         },
+                        SYNC_REPEAT_AYAH: {
+                          actions: assign({
+                            ayahNumber: (context, event: any) => event.ayahNumber,
+                          }),
+                          description:
+                            'Repeat moved on to the next ayah while the audio keeps playing',
+                        },
                         REPEAT_AYAH: {
                           actions: [
                             assign({

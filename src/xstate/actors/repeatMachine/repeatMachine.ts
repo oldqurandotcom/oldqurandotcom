@@ -93,6 +93,11 @@ export const createRepeatMachine = ({
         sendRepeatFinished: sendParent({ type: 'REPEAT_FINISHED' }),
         repeatAyah: pure((context, event: any) => {
           const verseDelay = event.verseDuration * context.delayMultiplier;
+          // with no pause between ayat, let the recitation flow into the next ayah: pausing and
+          // seeking to its start clips or replays a sliver of audio at every boundary
+          if (event.isContinuation && !verseDelay) {
+            return sendParent({ type: 'SYNC_REPEAT_AYAH', ayahNumber: event.verseNumber });
+          }
           return sendParent({ type: 'REPEAT_AYAH', ayahNumber: event.verseNumber, verseDelay });
         }),
         forwardToRangeCycleActor: forwardTo((context) => {

@@ -203,6 +203,8 @@ export const createRangeCycleMachine = ({
               type: 'REPEAT_AYAH',
               verseNumber: nextVerseNumber,
               verseDuration: previousVerseDuration,
+              // the previous ayah just finished playing, so the audio is already at this ayah
+              isContinuation: true,
             }),
             assign({
               verseCycleActor: spawn(

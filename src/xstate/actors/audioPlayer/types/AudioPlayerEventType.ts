@@ -32,6 +32,7 @@ type AudioPlayerEventType =
       surah: number;
     }
   | { type: 'REPEAT_AYAH'; ayahNumber: number; verseDelay: number }
+  | { type: 'SYNC_REPEAT_AYAH'; ayahNumber: number }
   | { type: 'PLAY_RADIO'; stationType: StationType; stationId: number }
   | { type: 'CLOSE_RADIO' }
   | {

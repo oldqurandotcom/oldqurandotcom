@@ -11,6 +11,7 @@ import DebuggingObserverWindow from './DebuggingObserverWindow';
 import Notes from './Notes/Notes';
 import styles from './QuranReader.module.scss';
 import QuranReaderView from './QuranReaderView';
+import SelectionRepeat from './SelectionRepeat';
 import SidebarNavigation from './SidebarNavigation/SidebarNavigation';
 
 import FontPreLoader from '@/components/Fonts/FontPreLoader';
@@ -68,6 +69,7 @@ const QuranReader = ({
       </div>
       <SidebarNavigation />
       <Notes />
+      <SelectionRepeat />
     </>
   );
 };

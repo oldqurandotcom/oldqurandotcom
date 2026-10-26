@@ -1,0 +1,36 @@
+.pill {
+  position: fixed;
+  z-index: var(--z-index-sticky);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxsmall);
+  padding-block: var(--spacing-xxsmall);
+  padding-inline: var(--spacing-small);
+  border: none;
+  border-radius: var(--border-radius-pill);
+  background-color: var(--color-success-medium);
+  color: #fff;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-small);
+  cursor: pointer;
+  white-space: nowrap;
+
+  svg {
+    width: var(--spacing-medium);
+    height: var(--spacing-medium);
+  }
+
+  kbd {
+    font-family: inherit;
+    font-size: var(--font-size-xsmall);
+    opacity: 0.8;
+  }
+}
+
+// while a loop is running and nothing is selected: sits above the audio player
+.stop {
+  inset-block-end: calc(5 * var(--spacing-large));
+  left: 50%;
+}

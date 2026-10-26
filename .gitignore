@@ -75,3 +75,7 @@ keys
 screenshots/
 .env.local
 .env*
+
+# mushaf page fonts are loaded from static.qurancdn.com
+/public/fonts/quran/hafs/v1/
+/public/fonts/quran/hafs/v2/

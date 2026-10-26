@@ -14,3 +14,19 @@
   border-block-end: 1px var(--color-borders-hairline) solid;
   min-height: calc(var(--spacing-mega) + var(--spacing-small));
 }
+
+.disclaimer {
+  padding-block: var(--spacing-medium);
+  font-size: var(--font-size-small);
+  line-height: 1.6;
+  color: var(--color-text-faded);
+
+  p {
+    margin-block-end: var(--spacing-small);
+  }
+}
+
+.disclaimerLink {
+  color: var(--color-success-medium);
+  font-weight: var(--font-weight-semibold);
+}

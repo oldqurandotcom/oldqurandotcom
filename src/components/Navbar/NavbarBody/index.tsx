@@ -3,7 +3,6 @@ import { memo } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { useDispatch } from 'react-redux';
 
-import InAppNotifications from '../InAppNotifications';
 import LanguageSelector from '../LanguageSelector';
 import NavbarLogoWrapper from '../Logo/NavbarLogoWrapper';
 import NavigationDrawer from '../NavigationDrawer/NavigationDrawer';
@@ -17,13 +16,11 @@ import Button, { ButtonShape, ButtonVariant } from '@/dls/Button/Button';
 import IconMenu from '@/icons/menu.svg';
 import IconSearch from '@/icons/search.svg';
 import IconSettings from '@/icons/settings.svg';
-import { NotificationsProvider } from '@/notifications/NotificationContext';
 import {
   setIsSearchDrawerOpen,
   setIsNavigationDrawerOpen,
   setIsSettingsDrawerOpen,
 } from '@/redux/slices/navbar';
-import { isLoggedIn } from '@/utils/auth/login';
 import { logEvent } from '@/utils/eventLogger';
 
 /**
@@ -76,11 +73,6 @@ const NavbarBody: React.FC = () => {
       <div className={styles.centerVertically}>
         <div className={styles.rightCTA}>
           <>
-            {isLoggedIn() && (
-              <NotificationsProvider>
-                <InAppNotifications />
-              </NotificationsProvider>
-            )}
             <MiniMushafButton />
             <LanguageSelector />
             <Button

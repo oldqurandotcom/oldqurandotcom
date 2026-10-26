@@ -34,8 +34,10 @@ const UnofficialBanner = () => {
   return (
     <div className={styles.container} role="note">
       <p className={styles.text}>
-        <strong>Unofficial copy of the old Quran.com design.</strong> This site is not affiliated
-        with Quran.com and is here only until they add a toggle for the old design.{' '}
+        <strong>Unofficial, non-commercial copy of the old Quran.com design.</strong> Not affiliated
+        with or endorsed by Quran.com, and no rights are claimed: the Quran text, translations,
+        recitations and design all belong to Quran.com and their providers. It&apos;s here for
+        personal access only, until they add a toggle for the old design.{' '}
         <a className={styles.link} href={NEW_QURAN_COM_URL}>
           Go to the new Quran.com →
         </a>

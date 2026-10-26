@@ -1,6 +1,6 @@
 {
-  "name": "Quran.com",
-  "short_name": "Quran.com",
+  "name": "Old Quran.com (unofficial)",
+  "short_name": "Old Quran.com",
   "icons": [
     {
       "src": "/images/logo/Logo@192x192.png",
@@ -58,5 +58,5 @@
   "display": "standalone",
   "orientation": "portrait",
   "categories": ["books", "education"],
-  "description": "Quran.com is an open source, un-biased, and non-sectarian source of Quranic study that uncovers the beauty of the Quran for Muslims and Non-Muslims."
+  "description": "Unofficial personal copy of the old Quran.com layout. Not affiliated with Quran.com."
 }

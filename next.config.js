@@ -128,6 +128,13 @@ const config = {
   },
   async redirects() {
     return [
+      // accounts and the official Quran.com pages aren't part of this unofficial copy
+      {
+        source:
+          '/:page(login|profile|collections|reading-goal|product-updates|about-us|privacy|support|apps|developers)/:rest*',
+        destination: '/',
+        permanent: false,
+      },
       {
         source: '/:surah/:from(\\d{1,})\\::to(\\d{1,})', // 1/2:3 => 1/2-3
         destination: '/:surah/:from-:to',

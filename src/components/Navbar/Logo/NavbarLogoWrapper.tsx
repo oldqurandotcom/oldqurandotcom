@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */ // the disclaimer is intentionally English-only
 import useTranslation from 'next-translate/useTranslation';
 
 import styles from './NavbarLogoWrapper.module.scss';
@@ -10,6 +11,7 @@ const NavbarLogoWrapper = () => {
   return (
     <Link href="/" className={styles.logoWrapper} title={t('quran-com')}>
       <QuranTextLogo />
+      <span className={styles.unofficial}>unofficial</span>
     </Link>
   );
 };

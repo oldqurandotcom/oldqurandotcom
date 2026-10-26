@@ -230,4 +230,13 @@ export default {
       wordByWordFontScale: initialState.quranReaderStyles.wordByWordFontScale,
     },
   }),
+  31: (state) => ({
+    // Arabic-only: reading mode, and no English word-by-word meanings
+    ...state,
+    readingPreferences: {
+      ...state.readingPreferences,
+      readingPreference: initialState.readingPreferences.readingPreference,
+      wordByWordContentType: initialState.readingPreferences.wordByWordContentType,
+    },
+  }),
 };

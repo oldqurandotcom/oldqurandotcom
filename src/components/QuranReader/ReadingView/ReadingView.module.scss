@@ -22,3 +22,14 @@
     position: unset !important;
   }
 }
+
+// two pages side by side, the odd one on the right like an open mushaf
+.spread {
+  display: flex;
+  direction: rtl;
+  justify-content: center;
+  align-items: flex-start;
+  column-gap: var(--spacing-mega);
+  // when both pages don't fit (big text, narrow window), they stack like the one-page view
+  flex-wrap: wrap;
+}

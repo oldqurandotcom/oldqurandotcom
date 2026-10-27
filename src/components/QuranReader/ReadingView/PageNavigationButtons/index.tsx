@@ -9,15 +9,23 @@ import styles from './PageNavigationButtons.module.scss';
 import Button, { ButtonSize } from '@/dls/Button/Button';
 import KeyboardInput from '@/dls/KeyboardInput';
 import { ContentSide } from '@/dls/Tooltip';
+import BookOpenIcon from '@/icons/book-open.svg';
 import ChevronDownIcon from '@/icons/chevron-down.svg';
 import { AudioPlayerMachineContext } from 'src/xstate/AudioPlayerMachineContext';
 
 interface Props {
   scrollToNextPage: () => void;
   scrollToPreviousPage: () => void;
+  isTwoPages?: boolean;
+  onToggleTwoPages?: () => void;
 }
 
-const PageNavigationButtons: React.FC<Props> = ({ scrollToNextPage, scrollToPreviousPage }) => {
+const PageNavigationButtons: React.FC<Props> = ({
+  scrollToNextPage,
+  scrollToPreviousPage,
+  isTwoPages,
+  onToggleTwoPages,
+}) => {
   const { t } = useTranslation('quran-reader');
   const audioService = useContext(AudioPlayerMachineContext);
   const isAudioPlayerHidden = useSelector(audioService, (state) => state.matches('HIDDEN'));
@@ -27,6 +35,19 @@ const PageNavigationButtons: React.FC<Props> = ({ scrollToNextPage, scrollToPrev
         [styles.audioPlayerOpen]: !isAudioPlayerHidden,
       })}
     >
+      {onToggleTwoPages && (
+        <Button
+          size={ButtonSize.Small}
+          className={classNames(styles.spreadButton, { [styles.spreadButtonActive]: isTwoPages })}
+          onClick={onToggleTwoPages}
+          ariaLabel={isTwoPages ? 'Show one page' : 'Show two pages'}
+          // eslint-disable-next-line i18next/no-literal-string
+          tooltip={isTwoPages ? 'One page' : 'Two pages, like an open mushaf'}
+          tooltipContentSide={ContentSide.LEFT}
+        >
+          <BookOpenIcon />
+        </Button>
+      )}
       <Button
         size={ButtonSize.Small}
         className={styles.prevButton}

@@ -17,6 +17,19 @@
   }
 }
 
+// the two-page switch only shows where two pages can fit
+.spreadButton {
+  display: none;
+  margin-block-end: var(--spacing-medium);
+  @include breakpoints.desktop {
+    display: flex;
+  }
+}
+
+.spreadButtonActive {
+  color: var(--color-success-medium);
+}
+
 .prevButton {
   margin-block-end: var(--spacing-micro);
   & svg {

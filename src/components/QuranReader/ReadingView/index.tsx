@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable react-func/max-lines-per-function */
 /* eslint-disable react/no-multi-comp */
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import classNames from 'classnames';
 import useTranslation from 'next-translate/useTranslation';
@@ -17,6 +17,13 @@ import PageContainer from './PageContainer';
 import PageNavigationButtons from './PageNavigationButtons';
 import styles from './ReadingView.module.scss';
 import ReadingViewSkeleton from './ReadingViewSkeleton';
+import Spread from './Spread';
+import {
+  getSpreadIndex,
+  getSpreadPageIndices,
+  getSpreadsCount,
+  useTwoPageSpread,
+} from './twoPageSpread';
 
 import useFetchPagesLookup from '@/components/QuranReader/hooks/useFetchPagesLookup';
 import onCopyQuranWords from '@/components/QuranReader/onCopyQuranWords';
@@ -95,9 +102,52 @@ const ReadingView = ({
     [lastReadPageNumber, pagesVersesRange],
   );
   const virtuosoRef = useRef<VirtuosoHandle>(null);
+
+  // with two pages side by side, each row of the list holds a pair of pages
+  const [isTwoPages, toggleTwoPages] = useTwoPageSpread();
+  const firstPageNumber = Number(Object.keys(pagesVersesRange)[0]);
+  const itemsCount = isTwoPages ? getSpreadsCount(pagesCount, firstPageNumber) : pagesCount;
+  const currentItemIndex = isTwoPages
+    ? getSpreadIndex(currentPageIndex, firstPageNumber)
+    : currentPageIndex;
+  // scrolling to a page goes to the row it's in
+  const pageScrollRef = useMemo(
+    () => ({
+      get current(): VirtuosoHandle {
+        const handle = virtuosoRef.current;
+        if (!handle || !isTwoPages) return handle;
+        return {
+          ...handle,
+          scrollToIndex: (location) => {
+            const { index, ...rest } =
+              typeof location === 'number' ? { index: location } : location;
+            handle.scrollToIndex({
+              ...rest,
+              index: getSpreadIndex(Number(index), firstPageNumber),
+            });
+          },
+        };
+      },
+    }),
+    [isTwoPages, firstPageNumber],
+  );
+  // stay on the same page when switching between one and two pages
+  const currentItemIndexRef = useRef(currentItemIndex);
+  currentItemIndexRef.current = currentItemIndex;
+  const isSwitchingLayout = useRef(false);
+  const onToggleTwoPages = useCallback(() => {
+    isSwitchingLayout.current = true;
+    toggleTwoPages();
+  }, [toggleTwoPages]);
+  useEffect(() => {
+    if (!isSwitchingLayout.current) return; // e.g. the remembered setting loading
+    isSwitchingLayout.current = false;
+    virtuosoRef.current?.scrollToIndex({ index: currentItemIndexRef.current, align: 'start' });
+  }, [isTwoPages]);
+
   useScrollToVirtualizedVerse(
     quranReaderDataType,
-    virtuosoRef,
+    pageScrollRef,
     initialData,
     quranReaderStyles,
     verses,
@@ -110,19 +160,19 @@ const ReadingView = ({
 
   const scrollToPreviousPage = useCallback(() => {
     virtuosoRef.current.scrollToIndex({
-      index: currentPageIndex - 1,
+      index: currentItemIndex - 1,
       align: 'start',
       offset: -35,
     });
-  }, [currentPageIndex]);
+  }, [currentItemIndex]);
 
   const scrollToNextPage = useCallback(() => {
     virtuosoRef.current.scrollToIndex({
-      index: currentPageIndex + 1,
+      index: currentItemIndex + 1,
       align: 'start',
       offset: 25,
     });
-  }, [currentPageIndex]);
+  }, [currentItemIndex]);
 
   const onPrevPageClicked = useCallback(() => {
     logButtonClick('reading_view_prev_page_button');
@@ -154,8 +204,22 @@ const ReadingView = ({
   useHotkeys('Up', onUpClicked, { enabled: allowKeyboardNavigation }, [scrollToPreviousPage]);
   useHotkeys('Down', onDownClicked, { enabled: allowKeyboardNavigation }, [scrollToNextPage]);
 
-  const itemContentRenderer = (pageIndex: number) => {
-    if (pageIndex === pagesCount) {
+  const renderPage = (pageIndex: number) => (
+    <PageContainer
+      key={pageIndex}
+      pagesVersesRange={pagesVersesRange}
+      quranReaderStyles={quranReaderStyles}
+      reciterId={reciterId}
+      lang={lang}
+      wordByWordLocale={wordByWordLocale}
+      pageIndex={pageIndex}
+      setMushafPageToVersesMap={setMushafPageToVersesMap}
+      initialData={initialData}
+    />
+  );
+
+  const itemContentRenderer = (itemIndex: number) => {
+    if (itemIndex === itemsCount) {
       const pageVerses = mushafPageToVersesMap[lastReadPageNumber];
       const lastVerse = pageVerses?.[pageVerses.length - 1];
       if (!lastVerse) return null;
@@ -169,18 +233,15 @@ const ReadingView = ({
       );
     }
 
-    return (
-      <PageContainer
-        pagesVersesRange={pagesVersesRange}
-        quranReaderStyles={quranReaderStyles}
-        reciterId={reciterId}
-        lang={lang}
-        wordByWordLocale={wordByWordLocale}
-        pageIndex={pageIndex}
-        setMushafPageToVersesMap={setMushafPageToVersesMap}
-        initialData={initialData}
-      />
-    );
+    if (isTwoPages) {
+      return (
+        <Spread>
+          {getSpreadPageIndices(itemIndex, firstPageNumber, pagesCount).map(renderPage)}
+        </Spread>
+      );
+    }
+
+    return renderPage(itemIndex);
   };
 
   if (hasError) {
@@ -212,7 +273,7 @@ const ReadingView = ({
             increaseViewportBy={INCREASE_VIEWPORT_BY_PIXELS}
             className={styles.virtuosoScroller}
             initialItemCount={1} // needed for SSR.
-            totalCount={pagesCount + 1}
+            totalCount={itemsCount + 1}
             itemContent={itemContentRenderer}
           />
         )}
@@ -221,6 +282,8 @@ const ReadingView = ({
         <PageNavigationButtons
           scrollToNextPage={onNextPageClicked}
           scrollToPreviousPage={onPrevPageClicked}
+          isTwoPages={isTwoPages}
+          onToggleTwoPages={onToggleTwoPages}
         />
       )}
     </>

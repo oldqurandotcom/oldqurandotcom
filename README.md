@@ -20,6 +20,8 @@ No ads, no tracking, nothing for sale.
 
 - **Select to loop:** select ayat, or just a few words, and press *Loop*; it repeats from the first
   selected word to the last until you press *Stop* or Esc.
+- **Two pages:** in reading view on a wide screen, the open-book button (bottom right) shows the
+  pages in pairs like a printed mushaf, odd page on the right.
 - **Cmd/Ctrl + and −** make the Quran text bigger or smaller instead of zooming the page.
 - **Mini Mushaf:** the current page in an always-on-top window while you work in other tabs
   (Chrome, Edge, Brave, Arc). Cmd −/+ changes the size.

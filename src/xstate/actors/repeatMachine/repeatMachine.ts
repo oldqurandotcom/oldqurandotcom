@@ -6,6 +6,8 @@ import { forwardTo, pure, send, sendParent } from 'xstate/lib/actions';
 
 import { createRangeCycleMachine } from '../rangeCycle/rangeCycleMachine';
 
+import trimToWords from './trimToWords';
+
 export const createRepeatMachine = ({
   totalRangeCycle,
   totalVerseCycle,
@@ -13,12 +15,14 @@ export const createRepeatMachine = ({
   fromVerseNumber,
   toVerseNumber,
   delayMultiplier,
+  fromWord = null,
+  toWord = null,
 }) =>
   /** @xstate-layout N4IgpgJg5mDOIC5QCcwAcwEMAuBZTAxgBYCWAdmAHTkAKyA9lKrLAMQT0XVkBu9A1lWSYyMAMIBPAgBsw+YuTCJQaerBLYSnZSAAeiACwGAzJQAcARgAMAVmMWzATmOOrZswBoQExNceVHdwB2CwsbCwMguwA2AF94rzJ6CDgdVAwceVIuWgYmOHgkEFV1TW0i-QQrLx8EaLjYr3SsPEJsqgAzchJYIkgdEo0tMh1Kg0cLSisAJgMbRyC3aKsgoLmaxGMzA0pohetZ6LszNZsEkGbMtsUBtSHy0EqAWlmNhCfogLMbOZsbbbszlm8XiQA */
   createMachine(
     {
       context: {
-        verseTimings,
+        ...trimToWords(verseTimings, { fromVerseNumber, toVerseNumber, fromWord, toWord }),
         fromVerseNumber,
         toVerseNumber,
         delayMultiplier,
@@ -98,20 +102,32 @@ export const createRepeatMachine = ({
           if (event.isContinuation && !verseDelay) {
             return sendParent({ type: 'SYNC_REPEAT_AYAH', ayahNumber: event.verseNumber });
           }
-          return sendParent({ type: 'REPEAT_AYAH', ayahNumber: event.verseNumber, verseDelay });
+          return sendParent({
+            type: 'REPEAT_AYAH',
+            ayahNumber: event.verseNumber,
+            verseDelay,
+            // differs from the ayah's own start when the loop starts mid-ayah
+            timestampFrom: context.verseTimings[event.verseNumber - 1].timestampFrom,
+          });
         }),
         forwardToRangeCycleActor: forwardTo((context) => {
           return context.rangeCycleActor;
         }),
-        updateVerseTimings: pure((context, event: any) => [
-          assign({
-            verseTimings: event.verseTimings,
-          }),
-          send(
-            { type: 'UPDATE_VERSE_TIMINGS', verseTimings: event.verseTimings },
-            { to: context.rangeCycleActor.id },
-          ),
-        ]),
+        updateVerseTimings: pure((context, event: any) => {
+          const trimmed = trimToWords(event.verseTimings, {
+            fromVerseNumber,
+            toVerseNumber,
+            fromWord,
+            toWord,
+          });
+          return [
+            assign(trimmed),
+            send(
+              { type: 'UPDATE_VERSE_TIMINGS', verseTimings: trimmed.verseTimings },
+              { to: context.rangeCycleActor.id },
+            ),
+          ];
+        }),
         spawnRangeCycleActor: assign({
           rangeCycleActor: (context) => {
             return spawn(

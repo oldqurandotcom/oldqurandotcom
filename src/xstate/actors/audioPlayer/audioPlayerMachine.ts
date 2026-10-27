@@ -10,6 +10,7 @@ import { pure, stop } from 'xstate/lib/actions';
 
 import { createRadioMachine } from '../radio/radioMachine';
 import { createRepeatMachine } from '../repeatMachine/repeatMachine';
+import { getWordTimestamps } from '../repeatMachine/trimToWords';
 
 import {
   getActiveAyahNumber,
@@ -340,7 +341,12 @@ export const audioPlayerMachine =
                               verseDelay: (context, event: any) => event.verseDelay,
                             }),
                             'pauseAudio',
-                            'setAudioPlayerCurrentTime',
+                            (context, event: any) => {
+                              // eslint-disable-next-line no-param-reassign
+                              context.audioPlayer.currentTime = milliSecondsToSeconds(
+                                event.timestampFrom,
+                              );
+                            },
                           ],
                           description: 'Repeat the current ayah',
                           target: '#audioPlayer.VISIBLE.AUDIO_PLAYER_INITIATED.DELAYING',
@@ -644,10 +650,21 @@ export const audioPlayerMachine =
                               totalVerseCycle: event.data.repeatEachVerse,
                               verseTimings: context.audioData.verseTimings,
                               delayMultiplier: event.data.delayMultiplier,
+                              fromWord: event.data.fromWord,
+                              toWord: event.data.toWord,
                             }),
                           );
                         },
                       }),
+                      (context, event: any) => {
+                        // a loop that starts mid-ayah starts at its first word
+                        const { from, fromWord, verseTimings } = event.data;
+                        const start = fromWord && getWordTimestamps(verseTimings, from, fromWord);
+                        if (start) {
+                          // eslint-disable-next-line no-param-reassign
+                          context.audioPlayer.currentTime = milliSecondsToSeconds(start[0]);
+                        }
+                      },
                     ],
                     description: 'The API call to get the selected chapter + Surah succeeded',
                     target: '#audioPlayer.VISIBLE.AUDIO_PLAYER_INITIATED.PLAYING.LOADING',

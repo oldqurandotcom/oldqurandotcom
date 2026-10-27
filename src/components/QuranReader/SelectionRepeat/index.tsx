@@ -3,71 +3,12 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import { useSelector } from '@xstate/react';
 
+import { getLoopLabel, getSelectedRange, SelectedRange } from './selection';
 import styles from './SelectionRepeat.module.scss';
 
-import { DATA_ATTRIBUTE_WORD_LOCATION } from '@/dls/QuranWord/QuranWord';
 import RepeatIcon from '@/icons/repeat.svg';
 import StopIcon from '@/icons/stop.svg';
 import { AudioPlayerMachineContext } from 'src/xstate/AudioPlayerMachineContext';
-
-type SelectedRange = { surah: number; from: number; to: number; top: number; left: number };
-
-const BUTTON_OFFSET = 10;
-const EDGE_MARGIN = 80;
-
-const parseVerseKey = (key: string) => {
-  const [surah, verse] = key.split(':').map(Number);
-  return { surah, verse };
-};
-
-/**
- * The verse keys a selection touches: Arabic words carry `data-word-location` ("2:255:3");
- * for a selection inside a translation, use the verse whose cell holds it.
- *
- * @param {Selection} selection
- * @returns {string[]}
- */
-const getSelectedVerseKeys = (selection: Selection): string[] => {
-  const keys = Array.from(document.querySelectorAll(`[${DATA_ATTRIBUTE_WORD_LOCATION}]`))
-    .filter((node) => selection.containsNode(node, true))
-    .map((node) =>
-      node.getAttribute(DATA_ATTRIBUTE_WORD_LOCATION).split(':').slice(0, 2).join(':'),
-    );
-  [selection.anchorNode, selection.focusNode].forEach((node) => {
-    let element = node instanceof Element ? node : node?.parentElement;
-    while (element && element !== document.body) {
-      const verses = element.querySelectorAll('[data-verse-key]');
-      if (verses.length === 1) {
-        keys.push(verses[0].getAttribute('data-verse-key'));
-        break;
-      }
-      if (verses.length > 1) break; // walked up past a single verse's cell
-      element = element.parentElement;
-    }
-  });
-  return keys;
-};
-
-const getSelectedRange = (): SelectedRange | null => {
-  const selection = document.getSelection();
-  if (!selection || selection.isCollapsed || !selection.rangeCount) return null;
-  const verses = getSelectedVerseKeys(selection).map(parseVerseKey);
-  if (!verses.length) return null;
-  // the repeat player loops within one surah; use the surah the selection starts in
-  const surah = Math.min(...verses.map((verse) => verse.surah));
-  const numbers = verses.filter((verse) => verse.surah === surah).map((verse) => verse.verse);
-  const rect = selection.getRangeAt(0).getBoundingClientRect();
-  return {
-    surah,
-    from: Math.min(...numbers),
-    to: Math.max(...numbers),
-    top: Math.min(rect.bottom + BUTTON_OFFSET, window.innerHeight - EDGE_MARGIN),
-    left: Math.min(
-      Math.max(rect.left + rect.width / 2, EDGE_MARGIN),
-      window.innerWidth - EDGE_MARGIN,
-    ),
-  };
-};
 
 /**
  * Select ayat with the mouse and a "Loop" button appears next to the selection;
@@ -118,6 +59,26 @@ const SelectionRepeat = () => {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [isRepeating, stopLoop]);
 
+  // timeupdate only fires every ~250ms; check every frame so a loop that ends mid-ayah stops
+  // right after its last word instead of running into the next one
+  useEffect(() => {
+    if (!isRepeating) return undefined;
+    let frame: number;
+    let isArmed = true;
+    const check = () => {
+      const { audioPlayer, repeatActor } = audioService.state.context;
+      const loopEnd = repeatActor?.getSnapshot()?.context.loopEndTimestamp;
+      if (loopEnd && audioPlayer && !audioPlayer.paused) {
+        const isPastEnd = audioPlayer.currentTime * 1000 >= loopEnd;
+        if (isPastEnd && isArmed) audioService.send({ type: 'UPDATE_TIMING' });
+        isArmed = !isPastEnd;
+      }
+      frame = requestAnimationFrame(check);
+    };
+    frame = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(frame);
+  }, [isRepeating, audioService]);
+
   const startLoop = () => {
     audioService.send({
       type: 'SET_REPEAT_SETTING',
@@ -127,6 +88,8 @@ const SelectionRepeat = () => {
       repeatRange: Infinity,
       repeatEachVerse: 1,
       delayMultiplier: 0,
+      fromWord: range.fromWord,
+      toWord: range.toWord,
     });
     document.getSelection()?.removeAllRanges();
     setRange(null);
@@ -136,10 +99,6 @@ const SelectionRepeat = () => {
   const keepSelection = (event: React.MouseEvent) => event.preventDefault();
 
   if (range) {
-    const label =
-      range.from === range.to
-        ? `Loop ${range.surah}:${range.from}`
-        : `Loop ${range.surah}:${range.from}–${range.to}`;
     return (
       <button
         type="button"
@@ -149,7 +108,7 @@ const SelectionRepeat = () => {
         onClick={startLoop}
       >
         <RepeatIcon />
-        {label}
+        {getLoopLabel(range)}
       </button>
     );
   }

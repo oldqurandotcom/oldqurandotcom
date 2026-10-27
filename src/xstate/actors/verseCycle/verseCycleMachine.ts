@@ -6,6 +6,9 @@
 import { assign, createMachine } from 'xstate';
 import { pure, sendParent } from 'xstate/lib/actions';
 
+// an ayah counts as finished this many ms before its end, since timeupdate only fires every ~250ms
+export const VERSE_END_BUFFER = 200;
+
 export const createVerseCycleMachine = ({ timestampFrom, timestampTo, totalVerseCycle }) =>
   /** @xstate-layout N4IgpgJg5mDOIC5QDcwCdZgMIE8DGANmAIJ4AuA9mgHQCWAdgApoVRpywDEAqowCLEAKgFEA+oICSAWQkA5AOKJQABwqxaZWhXpKQAD0QBaAEwB2AJzULxgCznjAZgAMTgBxOLAGhA5EAVktzIKDXP2MARlsbJ3CAX1jvVAxsfCJSShokzGF6CEhOXVV1TW1dAwRwu2oANjdq8PqG41dmh29fBAdTcOpzU1C3G1dw8OdHeISQego8+CQQLJTCEnIqOiYWNg5CtQ0tHXnyw2qHG2obRwdRroHzNp9-B2o-Fxs32vDTCxtq+MT0TC4ZbpNaLHJ5CA7Yr7MqIYxuaiuIYudzhO7mEbtRDhJx+c6uaqmALdGxo0nmP4LAFLNKrGgAMwYtFgAAtIFC9qVDtiHK5eqY7Gi3F9og4-FiEPY+aYImZqh9zNU-KZKYsgbSMhySgdQEclXyLg4rkb+i87hLDGj8S8PFdXATusZfhMgA */
   createMachine(
@@ -55,10 +58,7 @@ export const createVerseCycleMachine = ({ timestampFrom, timestampTo, totalVerse
     {
       guards: {
         verseEnded: (context, event: { timestamp: number }) => {
-          return (
-            event.timestamp >= context.timestampTo - 200 // 200ms is a buffer for the verse end time
-            // TODO: discuss this
-          );
+          return event.timestamp >= context.timestampTo - VERSE_END_BUFFER;
         },
         verseRepeatOnProgress: (context) => {
           return context.currentVerseCycle < context.totalVerseCycle;

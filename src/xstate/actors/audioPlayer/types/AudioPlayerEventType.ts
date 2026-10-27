@@ -30,8 +30,11 @@ type AudioPlayerEventType =
       repeatEachVerse: number;
       delayMultiplier: number;
       surah: number;
+      // word positions, for a loop that starts or stops mid-ayah
+      fromWord?: number;
+      toWord?: number;
     }
-  | { type: 'REPEAT_AYAH'; ayahNumber: number; verseDelay: number }
+  | { type: 'REPEAT_AYAH'; ayahNumber: number; verseDelay: number; timestampFrom: number }
   | { type: 'SYNC_REPEAT_AYAH'; ayahNumber: number }
   | { type: 'PLAY_RADIO'; stationType: StationType; stationId: number }
   | { type: 'CLOSE_RADIO' }

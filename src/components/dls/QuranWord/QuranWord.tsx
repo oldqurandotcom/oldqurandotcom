@@ -35,6 +35,7 @@ import { ReadingPreference, QuranFont, WordClickFunctionality } from 'types/Qura
 import Word, { CharType } from 'types/Word';
 
 export const DATA_ATTRIBUTE_WORD_LOCATION = 'data-word-location';
+export const DATA_ATTRIBUTE_AYAH_END = 'data-ayah-end';
 
 export type QuranWordProps = {
   word: Word;
@@ -145,6 +146,8 @@ const QuranWord = ({
       tabIndex={0}
       {...{
         [DATA_ATTRIBUTE_WORD_LOCATION]: wordLocation,
+        // lets a selection loop tell the ayah-number marker apart from the words
+        ...(word.charTypeName === CharType.End && { [DATA_ATTRIBUTE_AYAH_END]: true }),
       }}
       className={classNames(styles.container, {
         [styles.highlightOnHover]: isRecitationEnabled,

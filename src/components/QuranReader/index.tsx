@@ -15,6 +15,7 @@ import SelectionRepeat from './SelectionRepeat';
 import SidebarNavigation from './SidebarNavigation/SidebarNavigation';
 
 import FontPreLoader from '@/components/Fonts/FontPreLoader';
+import useFontSizeShortcuts from '@/hooks/useFontSizeShortcuts';
 import { selectNotes } from '@/redux/slices/QuranReader/notes';
 import { selectReadingPreference } from '@/redux/slices/QuranReader/readingPreferences';
 import { selectIsSidebarNavigationVisible } from '@/redux/slices/QuranReader/sidebarNavigation';
@@ -39,6 +40,7 @@ const QuranReader = ({
   const isSidebarNavigationVisible = useSelector(selectIsSidebarNavigationVisible);
   const readingPreference = useSelector(selectReadingPreference) as ReadingPreference;
   const isReadingPreference = readingPreference === ReadingPreference.Reading;
+  useFontSizeShortcuts();
 
   return (
     <>

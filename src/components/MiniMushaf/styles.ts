@@ -25,6 +25,7 @@ body {
 .page.zoomed .line { width: max-content; min-width: 100%; }
 .line { display: flex; justify-content: space-between; white-space: nowrap; line-height: 1.8; }
 .line.centered { justify-content: center; gap: 0.12em; }
+.line.start { justify-content: flex-start; }
 .header {
   direction: ltr;
   display: flex;

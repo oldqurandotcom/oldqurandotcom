@@ -8,6 +8,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import MiniMushafPage, { MiniMushafColors } from './MiniMushafPage';
 import MINI_MUSHAF_CSS from './styles';
 
+import { Riwayah, useRiwayah } from '@/components/QuranReader/Riwayah/RiwayahContext';
 import Button, { ButtonShape, ButtonVariant } from '@/dls/Button/Button';
 import { ToastStatus, useToast } from '@/dls/Toast/Toast';
 import PictureInPictureIcon from '@/icons/picture-in-picture.svg';
@@ -49,6 +50,7 @@ const MiniMushafButton = () => {
   const { page } = useSelector(selectLastReadVerseKey, shallowEqual);
   const { quranFont } = useSelector(selectQuranReaderStyles, shallowEqual);
   const theme = useSelector(selectTheme, shallowEqual);
+  const isQalun = useRiwayah().riwayah === Riwayah.Qalun;
   const [pipWindow, setPipWindow] = useState<Window | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   // the last page read, so the mini mushaf has something to show outside the reader too
@@ -115,6 +117,7 @@ const MiniMushafButton = () => {
         win={pipWindow}
         followPage={lastPageRef.current}
         isV1={quranFont !== QuranFont.MadaniV2}
+        isQalun={isQalun}
         colors={readThemeColors()}
         getChapterName={(chapterId) =>
           getChapterData(chaptersData, String(chapterId))?.transliteratedName ?? ''
@@ -123,7 +126,7 @@ const MiniMushafButton = () => {
       />,
       containerRef.current,
     );
-  }, [pipWindow, page, quranFont, theme, chaptersData, router]);
+  }, [pipWindow, page, quranFont, isQalun, theme, chaptersData, router]);
 
   return (
     <Button

@@ -12,7 +12,6 @@ import DebuggingObserverWindow from './DebuggingObserverWindow';
 import Notes from './Notes/Notes';
 import styles from './QuranReader.module.scss';
 import QuranReaderView from './QuranReaderView';
-import { RiwayahProvider } from './Riwayah/RiwayahContext';
 import SelectionRepeat from './SelectionRepeat';
 import SidebarNavigation from './SidebarNavigation/SidebarNavigation';
 
@@ -47,7 +46,7 @@ const QuranReader = ({
 
   const firstPage = initialData.verses[0]?.pageNumber;
   return (
-    <RiwayahProvider>
+    <>
       {isQCFFont(quranReaderStyles.quranFont) && firstPage && (
         <Head>
           {/* start the first page's font with the page itself, not after its verses load */}
@@ -88,7 +87,7 @@ const QuranReader = ({
       <SidebarNavigation />
       <Notes />
       <SelectionRepeat />
-    </RiwayahProvider>
+    </>
   );
 };
 

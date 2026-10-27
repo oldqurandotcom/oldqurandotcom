@@ -14,6 +14,7 @@ import DeveloperUtility from '@/components/DeveloperUtility/DeveloperUtility';
 import FontPreLoader from '@/components/Fonts/FontPreLoader';
 import GlobalListeners from '@/components/GlobalListeners';
 import Navbar from '@/components/Navbar/Navbar';
+import { RiwayahProvider } from '@/components/QuranReader/Riwayah/RiwayahContext';
 import SessionIncrementor from '@/components/SessionIncrementor';
 import Footer from '@/dls/Footer/Footer';
 import ToastContainerProvider from '@/dls/Toast/ToastProvider';
@@ -65,21 +66,24 @@ function MyApp({ Component, pageProps }): JSX.Element {
               <AudioPlayerMachineProvider>
                 <ReduxProvider locale={locale}>
                   <ThemeProvider>
-                    <UserAccountModal
-                      requiredFields={userData?.requiredFields}
-                      announcement={userData?.announcement}
-                    />
-                    <DefaultSeo
-                      {...createSEOConfig({ locale, description: t('default-description') })}
-                    />
-                    <GlobalListeners />
+                    {/* Hafs or Qalun: the reader and the Mini Mushaf (in the navbar) both follow it */}
+                    <RiwayahProvider>
+                      <UserAccountModal
+                        requiredFields={userData?.requiredFields}
+                        announcement={userData?.announcement}
+                      />
+                      <DefaultSeo
+                        {...createSEOConfig({ locale, description: t('default-description') })}
+                      />
+                      <GlobalListeners />
 
-                    <Navbar />
+                      <Navbar />
 
-                    <DeveloperUtility />
-                    <Component {...pageProps} />
-                    <AudioPlayer />
-                    <Footer />
+                      <DeveloperUtility />
+                      <Component {...pageProps} />
+                      <AudioPlayer />
+                      <Footer />
+                    </RiwayahProvider>
                   </ThemeProvider>
                   <SessionIncrementor />
                 </ReduxProvider>

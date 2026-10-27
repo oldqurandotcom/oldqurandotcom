@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { fetcher } from '@/api';
+import { getPageFirstVerseKey, getPageHizb } from '@/components/QuranReader/ReadingView/pageIndex';
 import ChevronLeftIcon from '@/icons/chevron-left.svg';
 import ChevronRightIcon from '@/icons/chevron-right.svg';
 import FollowIcon from '@/icons/find-location.svg';
@@ -29,7 +30,12 @@ type Verse = { verseNumber: number; chapterId: number; juzNumber: number; words:
 type PageLine =
   | { kind: 'words'; key: string; words: Word[] }
   | { kind: 'header'; key: string; chapterId: number }
-  | { kind: 'bismillah'; key: string };
+  | { kind: 'bismillah'; key: string }
+  // a Qalun line: its text, justified ("j"), start-aligned ("r") or centred ("c")
+  | { kind: 'text'; key: string; text: string; align: string };
+// a line of KFGQPC's Qalun typesetting, as in public/qalun/pages/<page>.json (see scripts/qalun)
+type QalunLine = [string, string, string];
+const QALUN_FONT_FAMILY = 'qalun-uthmanic';
 
 export type MiniMushafColors = Record<
   'bg' | 'text' | 'faded' | 'border' | 'accent' | 'hover' | 'bar',
@@ -40,6 +46,8 @@ interface Props {
   win: Window;
   followPage: number;
   isV1: boolean;
+  // show the Qalun 'an Nafi' mushaf, as the reader does when Qalun is chosen
+  isQalun: boolean;
   colors: MiniMushafColors;
   getChapterName: (chapterId: number) => string;
   onOpenInReader: (page: number) => void;
@@ -66,6 +74,20 @@ const getPageVerses = (page: number, isV1: boolean): Promise<Verse[]> => {
   return versesCache.get(cacheKey);
 };
 
+const qalunCache = new Map<number, Promise<QalunLine[]>>();
+
+const getQalunPage = (page: number): Promise<QalunLine[]> => {
+  if (!qalunCache.has(page)) {
+    const request = fetch(`${window.location.origin}/qalun/pages/${page}.json`).then((response) => {
+      if (!response.ok) throw new Error(`Qalun page ${page}: ${response.status}`);
+      return response.json() as Promise<QalunLine[]>;
+    });
+    request.catch(() => qalunCache.delete(page)); // allow a retry after a failure
+    qalunCache.set(page, request);
+  }
+  return qalunCache.get(page);
+};
+
 const loadFont = async (win: Window, family: string, source: string) => {
   const isLoaded = Array.from(win.document.fonts as unknown as Iterable<FontFace>).some(
     (font) => font.family.replace(/"/g, '') === family,
@@ -79,6 +101,21 @@ const loadFont = async (win: Window, family: string, source: string) => {
 
 const loadPageFont = (win: Window, page: number, isV1: boolean) =>
   loadFont(win, getFontFaceNameForPage(isV1, page), getV1OrV2FontFaceSource(isV1, page));
+
+const loadQalunFont = (win: Window) =>
+  loadFont(
+    win,
+    QALUN_FONT_FAMILY,
+    `url(${window.location.origin}/fonts/quran/qalun/uthmanic_qaloun_v21.ttf) format('truetype')`,
+  );
+
+// a Qalun page's lines: the typesetting already has every title, basmala and line in place
+const buildQalunLines = (qalun: QalunLine[]): PageLine[] =>
+  qalun.map(([kind, text, align], index) => {
+    const key = `q${index}`;
+    if (kind === 's') return { kind: 'header', key, chapterId: Number(text) };
+    return { kind: 'text', key, text, align: kind === 'b' ? 'c' : align };
+  });
 
 /**
  * Turn the page's words into its 15 mushaf lines. Lines the API leaves out are where a surah
@@ -128,10 +165,20 @@ const buildPageLines = (verses: Verse[]): PageLine[] => {
   return lines;
 };
 
+// a page's lines and its font, for Hafs (from Quran.com's API) or Qalun (from public/qalun)
+const loadPage = (win: Window, page: number, isV1: boolean, isQalun: boolean) =>
+  isQalun
+    ? Promise.all([getQalunPage(page), loadQalunFont(win)]).then(([qalun]) => ({ page, qalun }))
+    : Promise.all([getPageVerses(page, isV1), loadPageFont(win, page, isV1)]).then(([verses]) => ({
+        page,
+        verses,
+      }));
+
 const MiniMushafPage: React.FC<Props> = ({
   win,
   followPage,
   isV1,
+  isQalun,
   colors,
   getChapterName,
   onOpenInReader,
@@ -139,7 +186,11 @@ const MiniMushafPage: React.FC<Props> = ({
   const [page, setPage] = useState(followPage);
   const [isFollowing, setIsFollowing] = useState(true);
   // the page on screen only changes once the next page's words and font are both ready
-  const [loaded, setLoaded] = useState<{ page: number; verses: Verse[] } | null>(null);
+  const [loaded, setLoaded] = useState<{
+    page: number;
+    verses?: Verse[];
+    qalun?: QalunLine[];
+  } | null>(null);
   const [hasError, setHasError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [fontSize, setFontSize] = useState(0);
@@ -168,17 +219,14 @@ const MiniMushafPage: React.FC<Props> = ({
       'surahnames',
       `url(${window.location.origin}/fonts/quran/surah-names/v1/sura_names.woff2)`,
     );
-    Promise.all([getPageVerses(page, isV1), loadPageFont(win, page, isV1)])
-      .then(([pageVerses]) => {
+    loadPage(win, page, isV1, isQalun)
+      .then((next) => {
         if (isCancelled) return;
-        setLoaded({ page, verses: pageVerses });
+        setLoaded(next);
         const pipDocument = win.document;
         pipDocument.title = `Page ${page} · Mini Mushaf`;
         // warm up the next page (reading forward is the common case)
-        if (page < LAST_PAGE) {
-          getPageVerses(page + 1, isV1).catch(() => undefined);
-          loadPageFont(win, page + 1, isV1).catch(() => undefined);
-        }
+        if (page < LAST_PAGE) loadPage(win, page + 1, isV1, isQalun).catch(() => undefined);
       })
       .catch(() => {
         if (!isCancelled) setHasError(true);
@@ -186,10 +234,15 @@ const MiniMushafPage: React.FC<Props> = ({
     return () => {
       isCancelled = true;
     };
-  }, [page, isV1, win, retryCount]);
+  }, [page, isV1, isQalun, win, retryCount]);
 
-  const lines = useMemo(() => (loaded ? buildPageLines(loaded.verses) : []), [loaded]);
-  const fontFamily = loaded ? getFontFaceNameForPage(isV1, loaded.page) : undefined;
+  const lines = useMemo(() => {
+    if (!loaded) return [];
+    return loaded.qalun ? buildQalunLines(loaded.qalun) : buildPageLines(loaded.verses);
+  }, [loaded]);
+  const fontFamily = loaded?.qalun
+    ? QALUN_FONT_FAMILY
+    : loaded && getFontFaceNameForPage(isV1, loaded.page);
   // the first two pages are drawn as centered, decorated pages in the mushaf
   const isCenteredPage = loaded?.page <= 2;
 
@@ -247,10 +300,19 @@ const MiniMushafPage: React.FC<Props> = ({
     return () => win.removeEventListener('keydown', onKeyDown);
   }, [changeZoom, goToPage, page, win]);
 
-  const firstVerse = loaded?.page === page ? loaded.verses[0] : undefined;
-  const pageInfo = firstVerse
-    ? `Page ${page} · ${getChapterName(firstVerse.chapterId)} · Juz ${firstVerse.juzNumber}`
-    : `Page ${page}`;
+  // Qalun's pages break where Hafs's do, so its surah and juz come from the same page index
+  const firstVerse = loaded?.page === page ? loaded.verses?.[0] : undefined;
+  let pageInfo = `Page ${page}`;
+  if (firstVerse) {
+    pageInfo = `Page ${page} · ${getChapterName(firstVerse.chapterId)} · Juz ${
+      firstVerse.juzNumber
+    }`;
+  } else if (loaded?.page === page && loaded.qalun) {
+    const chapterId = Number(getPageFirstVerseKey(page).split(':')[0]);
+    pageInfo = `Page ${page} · ${getChapterName(chapterId)} · Juz ${Math.ceil(
+      getPageHizb(page) / 2,
+    )} · Qalun`;
+  }
 
   const renderLine = (line: PageLine) => {
     if (line.kind === 'header') {
@@ -258,6 +320,23 @@ const MiniMushafPage: React.FC<Props> = ({
         <div key={line.key} className="header">
           <span translate="no">{String(line.chapterId).padStart(3, '0')}</span>
           <span translate="no">surah</span>
+        </div>
+      );
+    }
+    if (line.kind === 'text') {
+      if (line.align === 'j') {
+        return (
+          <div key={line.key} className="line">
+            {line.text.split(' ').map((word, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <span key={index}>{word}</span>
+            ))}
+          </div>
+        );
+      }
+      return (
+        <div key={line.key} className={line.align === 'c' ? 'line centered' : 'line start'}>
+          {line.text}
         </div>
       );
     }
@@ -299,13 +378,14 @@ const MiniMushafPage: React.FC<Props> = ({
       {/* off-screen copy at a fixed size, used to work out how big the page can be drawn */}
       <div ref={measureRef} className="measure" style={{ fontFamily }} aria-hidden>
         {lines
-          .filter((line) => line.kind === 'words')
+          .filter((line) => line.kind === 'words' || line.kind === 'text')
           .map((line) => (
             <div key={line.key} className="line">
               {line.kind === 'words' &&
                 line.words.map((word) => (
                   <span key={word.id}>{isV1 ? word.codeV1 : word.codeV2}</span>
                 ))}
+              {line.kind === 'text' && line.text}
             </div>
           ))}
       </div>

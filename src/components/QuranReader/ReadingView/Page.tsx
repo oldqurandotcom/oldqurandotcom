@@ -41,6 +41,8 @@ const Page = ({ verses, pageNumber, quranReaderStyles, pageIndex }: PageProps) =
     <div
       id={`page-${pageNumber}`}
       className={classNames(styles.container, {
+        // sized from the page width like the two-page view (default font, whole lines only)
+        [styles.proportional]: quranFont === QuranFont.MadaniV1 && !isWordByWordLayout,
         [styles.mobileCenterText]: isBigTextLayout,
         [styles[getLineWidthClassName(FALLBACK_FONT, quranTextFontScale, mushafLines, true)]]:
           !isFontLoaded,

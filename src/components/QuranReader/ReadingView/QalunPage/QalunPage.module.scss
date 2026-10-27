@@ -1,0 +1,81 @@
+@use "src/styles/constants";
+
+// KFGQPC's Qalun typesetting is 22pt text in a 537.85pt block (24.45em) with lines 39.3pt apart
+// (1.787em); the page keeps those proportions at whatever width --line-width gives it
+$text-width-em: 24.45;
+$line-height-em: 1.787;
+
+.page {
+  position: relative;
+  // as wide as a Hafs page at the same size; phones have no --line-width, so the width a Hafs
+  // page gets there: the window less the reader's side margins (a percentage can't be used, the
+  // reader's columns size themselves to their pages)
+  width: var(--line-width, calc(100vw - 4rem));
+  max-width: 100%;
+  container-type: inline-size;
+  margin-block-start: constants.$reading-view-container-top-margin;
+  margin-block-end: var(--spacing-mega);
+  border-block-end: 1px var(--color-borders-hairline) solid;
+  direction: rtl;
+}
+
+// what the page reports to the reader's bar from
+.pageMarker {
+  // the page's top third: turning a page scrolls its very top just above the window, so a
+  // thinner marker could miss the band the reader watches
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 35%;
+  pointer-events: none;
+}
+
+.lines {
+  // sized from the page's width (100cqw) at the print's proportions
+  --qalun-font-size: calc(100cqw / #{$text-width-em});
+  --qalun-line-height: calc(100cqw / #{$text-width-em} * #{$line-height-em});
+  display: grid;
+  font-family: "qalun-uthmanic";
+  font-size: var(--qalun-font-size);
+  color: var(--color-text-default);
+}
+
+.line {
+  white-space: nowrap;
+  line-height: $line-height-em;
+}
+
+.justified {
+  display: flex;
+  justify-content: space-between;
+
+  // the site's reset gives spans their own line height, which would lower these lines' words
+  // below the start-aligned and centred lines'
+  > span {
+    line-height: inherit;
+  }
+}
+
+.start {
+  text-align: start;
+}
+
+.centred {
+  text-align: center;
+}
+
+// the printed surah heading, as tall as fits in one line of this page
+.decoratedLine {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.surahHeader {
+  font-family: "surah-header";
+  // the glyph is 0.392em tall: fill 90% of the line
+  font-size: calc(var(--qalun-line-height) * 0.9 / 0.392);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-text-default);
+}

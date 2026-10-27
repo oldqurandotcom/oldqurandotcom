@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { useDispatch, useStore } from 'react-redux';
 
+import { readerFontScaleCap } from '@/components/QuranReader/ReadingView/twoPageSpread';
 import { RootState } from '@/redux/RootState';
 import {
   decreaseQuranTextFontScale,
@@ -33,13 +34,20 @@ const useFontSizeShortcuts = () => {
       const { quranTextFontScale, translationFontScale } = selectQuranReaderStyles(
         store.getState(),
       );
+      // in the reading view, sizes above the largest that fits the window don't show
+      const cap = readerFontScaleCap.current ?? MAXIMUM_QURAN_FONT_STEP;
       if (isBigger) {
-        if (quranTextFontScale < MAXIMUM_QURAN_FONT_STEP) dispatch(increaseQuranTextFontScale());
+        if (quranTextFontScale >= Math.min(cap, MAXIMUM_QURAN_FONT_STEP)) return;
+        dispatch(increaseQuranTextFontScale());
         if (translationFontScale < MAXIMUM_TRANSLATIONS_FONT_STEP) {
           dispatch(increaseTranslationFontScale());
         }
       } else {
-        if (quranTextFontScale > MINIMUM_FONT_STEP) dispatch(decreaseQuranTextFontScale());
+        // step down from the size being shown, even if a bigger one was stored
+        const target = Math.max(Math.min(quranTextFontScale, cap) - 1, MINIMUM_FONT_STEP);
+        for (let step = quranTextFontScale; step > target; step -= 1) {
+          dispatch(decreaseQuranTextFontScale());
+        }
         if (translationFontScale > MINIMUM_FONT_STEP) dispatch(decreaseTranslationFontScale());
       }
     };

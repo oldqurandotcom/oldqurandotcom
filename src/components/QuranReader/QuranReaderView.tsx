@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 
 import useSyncReadingProgress from './hooks/useSyncReadingProgress';
 import ReadingPreferenceSwitcher from './ReadingPreferenceSwitcher';
+import { Riwayah, useRiwayah } from './Riwayah/RiwayahContext';
+import RiwayahSwitcher from './Riwayah/RiwayahSwitcher';
 import TranslationView from './TranslationView';
 
 import QuranReaderStyles from '@/redux/types/QuranReaderStyles';
@@ -31,11 +33,15 @@ const QuranReaderView: React.FC<Props> = ({
   useSyncReadingProgress({
     isReadingPreference,
   });
+  const { riwayah } = useRiwayah();
+  const isQalun = riwayah === Riwayah.Qalun;
 
-  if (isReadingPreference) {
+  // Qalun has no translations, so it always shows in the reading view
+  if (isReadingPreference || isQalun) {
     return (
       <>
-        <ReadingPreferenceSwitcher />
+        <RiwayahSwitcher />
+        {!isQalun && <ReadingPreferenceSwitcher />}
         <ReadingView
           quranReaderStyles={quranReaderStyles}
           quranReaderDataType={quranReaderDataType}
@@ -48,6 +54,7 @@ const QuranReaderView: React.FC<Props> = ({
 
   return (
     <>
+      <RiwayahSwitcher />
       <ReadingPreferenceSwitcher />
       <TranslationView
         quranReaderStyles={quranReaderStyles}

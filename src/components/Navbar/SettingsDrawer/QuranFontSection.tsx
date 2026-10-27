@@ -10,6 +10,7 @@ import QuranFontSectionFooter from './QuranFontSectionFooter';
 import Section from './Section';
 import VersePreview from './VersePreview';
 
+import { readerFontScaleCap } from '@/components/QuranReader/ReadingView/twoPageSpread';
 import Counter from '@/dls/Counter/Counter';
 import Select from '@/dls/Forms/Select';
 import Switch from '@/dls/Switch/Switch';
@@ -219,7 +220,11 @@ const QuranFontSection = () => {
           count={quranTextFontScale}
           onDecrement={quranTextFontScale === MINIMUM_FONT_STEP ? null : onFontScaleDecreaseClicked}
           onIncrement={
-            quranTextFontScale === MAXIMUM_QURAN_FONT_STEP ? null : onFontScaleIncreaseClicked
+            // in the reading view, stop at the largest size whose pages fit the window (old-Quran.com clone)
+            quranTextFontScale >=
+            Math.min(MAXIMUM_QURAN_FONT_STEP, readerFontScaleCap.current ?? MAXIMUM_QURAN_FONT_STEP)
+              ? null
+              : onFontScaleIncreaseClicked
           }
         />
       </Section.Row>

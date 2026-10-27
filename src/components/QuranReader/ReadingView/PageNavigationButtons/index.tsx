@@ -18,6 +18,8 @@ interface Props {
   scrollToPreviousPage: () => void;
   isTwoPages?: boolean;
   onToggleTwoPages?: () => void;
+  // the page arrows; hidden at large text sizes, where the two-page switch still shows
+  isPageNavigationShown?: boolean;
 }
 
 const PageNavigationButtons: React.FC<Props> = ({
@@ -25,6 +27,7 @@ const PageNavigationButtons: React.FC<Props> = ({
   scrollToPreviousPage,
   isTwoPages,
   onToggleTwoPages,
+  isPageNavigationShown = true,
 }) => {
   const { t } = useTranslation('quran-reader');
   const audioService = useContext(AudioPlayerMachineContext);
@@ -48,32 +51,36 @@ const PageNavigationButtons: React.FC<Props> = ({
           <BookOpenIcon />
         </Button>
       )}
-      <Button
-        size={ButtonSize.Small}
-        className={styles.prevButton}
-        onClick={scrollToPreviousPage}
-        shouldFlipOnRTL={false}
-        tooltip={
-          <>
-            {t('prev-page')} <KeyboardInput invertColors keyboardKey="⬆" />
-          </>
-        }
-        tooltipContentSide={ContentSide.LEFT}
-      >
-        <ChevronDownIcon />
-      </Button>
-      <Button
-        size={ButtonSize.Small}
-        onClick={scrollToNextPage}
-        tooltip={
-          <>
-            {t('next-page')} <KeyboardInput invertColors keyboardKey="⬇" />
-          </>
-        }
-        tooltipContentSide={ContentSide.LEFT}
-      >
-        <ChevronDownIcon />
-      </Button>
+      {isPageNavigationShown && (
+        <>
+          <Button
+            size={ButtonSize.Small}
+            className={styles.prevButton}
+            onClick={scrollToPreviousPage}
+            shouldFlipOnRTL={false}
+            tooltip={
+              <>
+                {t('prev-page')} <KeyboardInput invertColors keyboardKey="⬆" />
+              </>
+            }
+            tooltipContentSide={ContentSide.LEFT}
+          >
+            <ChevronDownIcon />
+          </Button>
+          <Button
+            size={ButtonSize.Small}
+            onClick={scrollToNextPage}
+            tooltip={
+              <>
+                {t('next-page')} <KeyboardInput invertColors keyboardKey="⬇" />
+              </>
+            }
+            tooltipContentSide={ContentSide.LEFT}
+          >
+            <ChevronDownIcon />
+          </Button>
+        </>
+      )}
     </div>
   );
 };

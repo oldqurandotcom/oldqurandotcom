@@ -1,15 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 import classNames from 'classnames';
 
 import Line from '../Line';
 import PageFooter from '../PageFooter';
+import { getPageHizb } from '../pageIndex';
 
 import styles from './MushafPage.module.scss';
 import getSurahHeaderGlyph from './surahHeaderGlyphs';
 import { MushafPageLines } from './useMushafLines';
 
+import { QURAN_READER_OBSERVER_ID } from '@/components/QuranReader/observer';
 import Bismillah from '@/dls/Bismillah/Bismillah';
+import useObserveElement from '@/hooks/useObserveElement';
 import QuranReaderStyles from '@/redux/types/QuranReaderStyles';
 import { getVerseWords } from '@/utils/verse';
 import Verse from 'types/Verse';
@@ -21,6 +24,8 @@ type Props = {
   lines: MushafPageLines;
   quranReaderStyles: QuranReaderStyles;
   pageIndex: number;
+  // the first ayah of the surah or juz being read on this page, if it's on it
+  verseKey?: string;
 };
 
 const isAyahLine = (entry: string) => entry[0] === 'a' || entry[0] === 'c';
@@ -63,22 +68,44 @@ const placeWords = (words: Word[], lines: MushafPageLines): Record<number, Word[
  *
  * @returns {JSX.Element}
  */
-const MushafPage = ({ verses, pageNumber, lines, quranReaderStyles, pageIndex }: Props) => {
-  const lineWords = useMemo(
-    () =>
-      placeWords(
-        verses.flatMap((verse) => getVerseWords(verse, true)),
-        lines,
-      ),
-    [verses, lines],
-  );
+const MushafPage = ({
+  verses,
+  pageNumber,
+  lines,
+  quranReaderStyles,
+  pageIndex,
+  verseKey,
+}: Props) => {
+  const pageWords = useMemo(() => verses.flatMap((verse) => getVerseWords(verse, true)), [verses]);
+  const lineWords = useMemo(() => placeWords(pageWords, lines), [pageWords, lines]);
   // Al-Fatiha and the start of Al-Baqarah sit in the middle of their pages
   const emptyAtEnd = lines.length - 1 - lines.map(Boolean).lastIndexOf(true);
   const offset = Math.floor(emptyAtEnd / 2);
 
+  // the page reports surah, hizb and page to the reader's bar through a marker at its top (its
+  // top is often a heading, with no verse; a whole page is too tall to be 10% inside the band
+  // the reader watches). A facing page from outside the surah/juz (no verseKey) doesn't report
+  const ref = useRef<HTMLDivElement>(null);
+  useObserveElement(verseKey ? ref : null, QURAN_READER_OBSERVER_ID);
+  const pageVerseKey = verseKey ?? verses[0]?.verseKey;
+  const pageHizb =
+    verses.find((verse) => verse.verseKey === pageVerseKey)?.hizbNumber ?? getPageHizb(pageNumber);
+
   return (
-    <div id={`page-${pageNumber}`} className={styles.page}>
-      <div className={styles.lines} style={{ gridTemplateRows: `repeat(${lines.length}, 1fr)` }}>
+    <div id={`page-${pageNumber}`} className={styles.page} data-verse-key={pageVerseKey}>
+      <div
+        ref={ref}
+        className={styles.pageMarker}
+        aria-hidden
+        data-verse-key={pageVerseKey}
+        data-chapter-id={pageVerseKey?.split(':')[0]}
+        data-page={pageNumber}
+        data-hizb={pageHizb}
+      />
+      <div
+        className={styles.lines}
+        style={{ gridTemplateRows: `repeat(${lines.length}, var(--mushaf-row))` }}
+      >
         {lines.map((entry, index) => {
           const key = `${pageNumber}-${index}`;
           const row = index + 1 + offset;
@@ -98,6 +125,7 @@ const MushafPage = ({ verses, pageNumber, lines, quranReaderStyles, pageIndex }:
                     lineIndex={index}
                     isMushafLayout
                     isCentered={entry[0] === 'c'}
+                    isObserved={!!verseKey}
                   />
                 )}
               </div>

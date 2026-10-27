@@ -1,13 +1,31 @@
 @use "src/styles/constants";
 
 .page {
+  position: relative;
+  // Everything is sized from the page's width (--line-width), at the proportions of the printed
+  // page, so every text size is the same page scaled: 15.4 text-sizes and 8.85 lines across.
+  // (The widest line of all 604 pages is 15.115em, so 15.4 leaves every line room; the reader's
+  // own text-size and line-height steps aren't in proportion with the page widths.)
+  --mushaf-font: calc(var(--line-width) / 15.4);
+  --mushaf-row: calc(var(--line-width) / 8.85);
   margin-block-start: constants.$reading-view-container-top-margin;
   margin-block-end: var(--spacing-mega);
   border-block-end: 1px var(--color-borders-hairline) solid;
 }
 
-// one row per printed line; 1fr rows all grow to the tallest line, so empty and decorated
-// lines keep the page the height of the print
+// what the page reports to the reader's bar from (see index.tsx)
+.pageMarker {
+  // the page's top third: turning a page scrolls its very top just above the window, so a
+  // thinner marker could miss the band the reader watches
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 35%;
+  pointer-events: none;
+}
+
+// one row per printed line, all the same height, so empty and decorated lines keep the page the
+// height of the print
 .lines {
   display: grid;
   width: var(--line-width, auto);
@@ -16,6 +34,24 @@
 
 .line {
   min-width: 0;
+
+  // the verse text: its size and line height come from the page, not the reader's size steps,
+  // and nothing inside (the site's reset gives every div and span its own line height) differs
+  [data-verse-key] {
+    font-size: var(--mushaf-font);
+    --line-height: var(--mushaf-row);
+    line-height: var(--mushaf-row);
+  }
+
+  [data-verse-key] * {
+    line-height: inherit;
+  }
+
+  // centred lines (short last lines, the first two pages) have no spare width to spread, so
+  // their words need a gap of their own
+  [class*="verseTextCenterAlign"] {
+    column-gap: 0.2em;
+  }
 }
 
 // surah names and the Bismillah are drawn to fit the line, without making it taller
@@ -29,9 +65,10 @@
 }
 
 .surahHeader {
-  // each glyph is 3.246em wide, so this fills the line's width like the printed frame
+  // each heading glyph is 3.30em wide and 0.392em tall: as wide as the line, unless that would
+  // make it taller than the line
   font-family: "surah-header";
-  font-size: 30.8cqw;
+  font-size: min(30.28cqw, 250cqh);
   line-height: 1;
   white-space: nowrap;
   color: var(--color-text-default);
@@ -39,7 +76,7 @@
 
 // IndoPak 16 lines: the frame and the Bismillah share the line
 .withBismillah .surahHeader {
-  font-size: 15cqw;
+  font-size: min(15cqw, 250cqh);
 }
 
 .bismillah {

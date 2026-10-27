@@ -1,7 +1,13 @@
 import { RefObject, useCallback, useState } from 'react';
 
 import useBrowserLayoutEffect from '@/hooks/useBrowserLayoutEffect';
-import { MINIMUM_FONT_STEP } from '@/redux/slices/QuranReader/styles';
+import { MAXIMUM_QURAN_FONT_STEP, MINIMUM_FONT_STEP } from '@/redux/slices/QuranReader/styles';
+
+/**
+ * The largest text size at which the reading view's pages fit, while the reading view is open
+ * (null otherwise). Cmd + stops there instead of storing sizes that wouldn't show.
+ */
+export const readerFontScaleCap: { current: number | null } = { current: null };
 
 // Two-page view (added in the old-Quran.com clone): pages are shown in pairs like an open
 // printed mushaf, where an odd page sits on the right and the even page after it on the left.
@@ -45,6 +51,18 @@ export const getSpreadPageIndices = (
 };
 
 /**
+ * Whether a text size's class sets a page width here (it doesn't on phones).
+ *
+ * @returns {boolean}
+ */
+const hasPageWidth = (probe: HTMLElement, className: string): boolean => {
+  const sizing = document.createElement('div');
+  sizing.className = className;
+  probe.appendChild(sizing);
+  return getComputedStyle(sizing).getPropertyValue('--line-width').trim() !== '';
+};
+
+/**
  * Measure page widths (--line-width) with hidden probes inside the reading view and return the
  * biggest size, up to `fontScale`, at which two pages and the gap between them fit.
  *
@@ -54,6 +72,8 @@ const findFittingScale = (
   container: HTMLElement,
   fontScale: number,
   getLineWidthClassName: (scale: number) => string,
+  pagesAcross: number,
+  isSizedByWidth: boolean,
 ): number => {
   const probe = document.createElement('div');
   probe.style.cssText = 'position:absolute;visibility:hidden;height:0;overflow:hidden;';
@@ -68,42 +88,58 @@ const findFittingScale = (
     return inner.getBoundingClientRect().width;
   };
   const gap = measure('', 'var(--spacing-mega)');
+  // pages whose text is sized only by their width (Qalun) can't change size where no page width
+  // is set (phones): the smallest size is the only one
+  if (isSizedByWidth && !hasPageWidth(probe, getLineWidthClassName(fontScale))) {
+    probe.remove();
+    return MINIMUM_FONT_STEP;
+  }
   let fitting = fontScale;
   for (let candidate = fontScale; candidate >= MINIMUM_FONT_STEP; candidate -= 1) {
     fitting = candidate;
     const pageWidth = measure(getLineWidthClassName(candidate), 'var(--line-width)');
-    if (pageWidth * 2 + gap <= container.clientWidth) break;
+    if (pageWidth * pagesAcross + gap * (pagesAcross - 1) <= container.clientWidth) break;
   }
   probe.remove();
   return fitting;
 };
 
 /**
- * The biggest Quran text size, up to the reader's own, at which two pages fit side by side.
- * The whole two-page view uses it, so every pair is the same size. Null when off.
+ * The biggest Quran text size, up to the reader's own, at which the page (or, in the two-page
+ * view, both pages) fits the reader's width, so Cmd + never pushes a page off the side of the
+ * window. The whole view uses it, so every page is the same size. Null until measured.
  *
- * @param {boolean} isEnabled
  * @param {RefObject<HTMLElement>} containerRef the reading view, whose width the pages share
  * @param {number} fontScale the reader's chosen size
  * @param {(scale: number) => string} getLineWidthClassName sets --line-width for a size
+ * @param {number} pagesAcross 1, or 2 in the two-page view
+ * @param {boolean} isSizedByWidth the pages' text is sized only by their width (Qalun)
  * @returns {number | null}
  */
-export const useTwoPageFontScale = (
-  isEnabled: boolean,
+export const useFittingFontScale = (
   containerRef: RefObject<HTMLElement>,
   fontScale: number,
   getLineWidthClassName: (scale: number) => string,
+  pagesAcross: number,
+  isSizedByWidth = false,
 ): number | null => {
-  const [scale, setScale] = useState<number | null>(null);
+  const [cap, setCap] = useState<number | null>(null);
 
   // measured before paint, so pages never show at one size and then shrink
   useBrowserLayoutEffect(() => {
     const container = containerRef.current;
-    if (!isEnabled || !container) {
-      setScale(null);
-      return undefined;
-    }
-    const fit = () => setScale(findFittingScale(container, fontScale, getLineWidthClassName));
+    if (!container) return undefined;
+    const fit = () => {
+      const largest = findFittingScale(
+        container,
+        MAXIMUM_QURAN_FONT_STEP,
+        getLineWidthClassName,
+        pagesAcross,
+        isSizedByWidth,
+      );
+      readerFontScaleCap.current = largest;
+      setCap(largest);
+    };
     fit();
     // page widths follow the window's height as well as its width
     const observer = new ResizeObserver(fit);
@@ -112,10 +148,11 @@ export const useTwoPageFontScale = (
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', fit);
+      readerFontScaleCap.current = null;
     };
-  }, [isEnabled, containerRef, fontScale, getLineWidthClassName]);
+  }, [containerRef, getLineWidthClassName, pagesAcross, isSizedByWidth]);
 
-  return scale;
+  return cap === null ? null : Math.min(fontScale, cap);
 };
 
 /**

@@ -10,6 +10,7 @@ import styles from './ContextMenu.module.scss';
 import ReadingPreferenceSwitcher, {
   ReadingPreferenceSwitcherType,
 } from './ReadingPreferenceSwitcher';
+import { Riwayah, useRiwayah } from './Riwayah/RiwayahContext';
 
 import { SwitchSize } from '@/dls/Switch/Switch';
 import ChevronDownIcon from '@/icons/chevron-down.svg';
@@ -35,10 +36,13 @@ const ContextMenu = () => {
   const isSidebarNavigationVisible = useSelector(selectIsSidebarNavigationVisible);
   const { t, lang } = useTranslation('common');
   const isSideBarVisible = useSelector(selectNotes, shallowEqual).isVisible;
-  const { isExpanded, showReadingPreferenceSwitcher } = useSelector(
+  const { isExpanded, showReadingPreferenceSwitcher: isSwitcherShown } = useSelector(
     selectContextMenu,
     shallowEqual,
   );
+  // Qalun shows only in the reading view, so there's no Translation | Reading choice to make
+  const { riwayah } = useRiwayah();
+  const showReadingPreferenceSwitcher = isSwitcherShown && riwayah !== Riwayah.Qalun;
   const isNavbarVisible = useSelector(selectNavbar, shallowEqual).isVisible;
   const { verseKey, chapterId, page, hizb } = useSelector(selectLastReadVerseKey, shallowEqual);
   const chapterData = useMemo(() => {

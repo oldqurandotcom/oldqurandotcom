@@ -132,6 +132,7 @@ const PageContainer: React.FC<Props> = ({
         lines={pageLines}
         quranReaderStyles={quranReaderStyles}
         pageIndex={pageIndex}
+        verseKey={pagesVersesRange[pageNumber]?.from}
       />
     );
   }

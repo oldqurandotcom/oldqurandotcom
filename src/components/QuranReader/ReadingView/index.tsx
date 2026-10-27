@@ -16,13 +16,15 @@ import useScrollToVirtualizedVerse from './hooks/useScrollToVirtualizedVerse';
 import useMushafLines, { TWO_PAGE_FONT } from './MushafPage/useMushafLines';
 import PageContainer from './PageContainer';
 import PageNavigationButtons from './PageNavigationButtons';
+import QalunPage from './QalunPage';
+import useVisibleQalunPage from './QalunPage/useVisibleQalunPage';
 import styles from './ReadingView.module.scss';
 import ReadingViewSkeleton from './ReadingViewSkeleton';
 import {
   getSpreadIndex,
   getSpreadPageIndices,
   getSpreadsCount,
-  useTwoPageFontScale,
+  useFittingFontScale,
   useTwoPageSpread,
 } from './twoPageSpread';
 
@@ -30,6 +32,7 @@ import { FontScaleOverrideContext } from '@/components/QuranReader/contexts/Font
 import useFetchPagesLookup from '@/components/QuranReader/hooks/useFetchPagesLookup';
 import onCopyQuranWords from '@/components/QuranReader/onCopyQuranWords';
 import QueryParamMessage from '@/components/QuranReader/QueryParamMessage';
+import { Riwayah, useRiwayah } from '@/components/QuranReader/Riwayah/RiwayahContext';
 import Spinner from '@/dls/Spinner/Spinner';
 import useGetQueryParamOrReduxValue from '@/hooks/useGetQueryParamOrReduxValue';
 import useGetQueryParamOrXstateValue from '@/hooks/useGetQueryParamOrXstateValue';
@@ -42,7 +45,7 @@ import { getLineWidthClassName } from '@/utils/fontFaceHelper';
 import Error from 'src/pages/_error';
 import { VersesResponse } from 'types/ApiResponses';
 import QueryParam from 'types/QueryParam';
-import { QuranReaderDataType } from 'types/QuranReader';
+import { QuranFont, QuranReaderDataType } from 'types/QuranReader';
 import Verse from 'types/Verse';
 
 const EndOfScrollingControls = dynamic(
@@ -64,6 +67,8 @@ const INCREASE_VIEWPORT_BY_PIXELS = 1200;
 const MADANI_MUSHAF_PAGES = 604;
 // how many pages either side of the current one get their fonts loaded ahead
 const FONT_PRELOAD_PAGES = 2;
+const NO_VERSES: Verse[] = [];
+const NO_PAGES: number[] = [];
 
 const ReadingView = ({
   quranReaderStyles,
@@ -94,6 +99,11 @@ const ReadingView = ({
     QueryParam.WBW_LOCALE,
   );
   const { quranFont, mushafLines, quranTextFontScale } = quranReaderStyles;
+  // Qalun pages share Hafs's page numbers (both follow the Madani mushaf's 604 pages), so the
+  // same lookup, page turning and two-page pairing serve both; only the page drawn differs
+  const isQalun = useRiwayah().riwayah === Riwayah.Qalun;
+  // page widths: Qalun pages are as wide as Madani V1 pages at the same text size
+  const layoutFont = isQalun ? QuranFont.MadaniV1 : quranFont;
   const { pagesCount, hasError, pagesVersesRange, isLoading } = useFetchPagesLookup(
     resourceId,
     quranReaderDataType,
@@ -101,33 +111,38 @@ const ReadingView = ({
     quranReaderStyles,
     isUsingDefaultFont,
   );
+  const visibleQalunPage = useVisibleQalunPage(isQalun);
   const currentPageIndex = useMemo(
-    () => getPageIndexByPageNumber(Number(lastReadPageNumber), pagesVersesRange),
-    [lastReadPageNumber, pagesVersesRange],
+    () =>
+      getPageIndexByPageNumber(Number(visibleQalunPage ?? lastReadPageNumber), pagesVersesRange),
+    [visibleQalunPage, lastReadPageNumber, pagesVersesRange],
   );
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   // with two pages side by side, each row of the list holds a pair of pages
   const [isTwoPagesChosen, toggleTwoPages] = useTwoPageSpread();
-  // two pages only with the default font; other fonts keep the usual view
-  const canShowTwoPages = quranFont === TWO_PAGE_FONT;
+  // two pages with the default font (and with Qalun, which has its own); other fonts keep the
+  // usual view
+  const canShowTwoPages = isQalun || quranFont === TWO_PAGE_FONT;
   const isTwoPages = isTwoPagesChosen && canShowTwoPages;
   // where every line of each printed page goes (null for fonts without a fixed layout)
-  const pageLayouts = useMushafLines(isTwoPages, quranFont);
+  const pageLayouts = useMushafLines(isTwoPages && !isQalun, quranFont);
   const lastMushafPage = pageLayouts ? Object.keys(pageLayouts).length : MADANI_MUSHAF_PAGES;
-  // one text size for the whole two-page view, the biggest at which both pages fit
+  // one text size for the whole view, the biggest (up to the reader's) at which the page, or
+  // both pages, fit the width
   const containerRef = useRef<HTMLDivElement>(null);
   const getLineWidthClass = useCallback(
-    (scale: number) => styles[getLineWidthClassName(quranFont, scale, mushafLines)],
-    [quranFont, mushafLines],
+    (scale: number) => styles[getLineWidthClassName(layoutFont, scale, mushafLines)],
+    [layoutFont, mushafLines],
   );
-  const twoPageFontScale = useTwoPageFontScale(
-    isTwoPages,
+  const fittedFontScale = useFittingFontScale(
     containerRef,
     quranTextFontScale,
     getLineWidthClass,
+    isTwoPages ? 2 : 1,
+    isQalun,
   );
-  const fontScale = twoPageFontScale ?? quranTextFontScale;
+  const fontScale = fittedFontScale ?? quranTextFontScale;
   const pageStyles = useMemo(
     () =>
       fontScale === quranTextFontScale
@@ -137,7 +152,8 @@ const ReadingView = ({
   );
   const firstPageNumber = Number(Object.keys(pagesVersesRange)[0]);
   // the two-page view appears only once its text size and page layouts are known
-  const isTwoPageViewReady = !isTwoPages || (twoPageFontScale !== null && !!pageLayouts);
+  const isTwoPageViewReady =
+    !isTwoPages || (fittedFontScale !== null && (isQalun || !!pageLayouts));
   const itemsCount = isTwoPages ? getSpreadsCount(pagesCount, firstPageNumber) : pagesCount;
   const currentItemIndex = isTwoPages
     ? getSpreadIndex(currentPageIndex, firstPageNumber)
@@ -154,7 +170,7 @@ const ReadingView = ({
     }
     return pages;
   }, [pagesCount, firstPageNumber, currentPageIndex, isTwoPages, lastMushafPage]);
-  useQcfFont(quranFont, verses, pagesToPreload);
+  useQcfFont(quranFont, isQalun ? NO_VERSES : verses, isQalun ? NO_PAGES : pagesToPreload);
 
   // scrolling to a page goes to the row it's in
   const pageScrollRef = useMemo(
@@ -178,18 +194,46 @@ const ReadingView = ({
     [isTwoPages, firstPageNumber],
   );
   // stay on the same page when switching between one and two pages
-  const currentItemIndexRef = useRef(currentItemIndex);
-  currentItemIndexRef.current = currentItemIndex;
   const isSwitchingLayout = useRef(false);
   const onToggleTwoPages = useCallback(() => {
     isSwitchingLayout.current = true;
     toggleTwoPages();
   }, [toggleTwoPages]);
+  // the page the reader was on when switching, kept until the new view has drawn (it briefly shows
+  // a placeholder while the text size is worked out, and there's nothing to scroll until then)
+  const pageWhenSwitching = useRef<number | null>(null);
+  const onToggleTwoPagesAt = useCallback(() => {
+    const page = firstPageNumber + Math.max(currentPageIndex || 0, 0);
+    // leaving a pair, go back to its first (right-hand, odd) page, if it's in this surah/juz
+    pageWhenSwitching.current = isTwoPages
+      ? Math.max(page % 2 === 0 ? page - 1 : page, firstPageNumber)
+      : page;
+    onToggleTwoPages();
+  }, [firstPageNumber, currentPageIndex, isTwoPages, onToggleTwoPages]);
+  // switching riwayah keeps the page too: remember the page shown before the switch
+  const currentPageNumber = firstPageNumber + Math.max(currentPageIndex || 0, 0);
+  const pageBeforeThisRender = useRef(currentPageNumber);
+  const lastIsQalun = useRef(isQalun);
   useEffect(() => {
-    if (!isSwitchingLayout.current) return; // e.g. the remembered setting loading
+    if (lastIsQalun.current !== isQalun) {
+      lastIsQalun.current = isQalun;
+      pageWhenSwitching.current = pageBeforeThisRender.current;
+      isSwitchingLayout.current = true;
+    }
+    pageBeforeThisRender.current = currentPageNumber;
+  });
+  useEffect(() => {
+    if (!isSwitchingLayout.current || !isTwoPageViewReady || pageWhenSwitching.current === null) {
+      return; // e.g. the remembered setting loading, or the new view not drawn yet
+    }
     isSwitchingLayout.current = false;
-    virtuosoRef.current?.scrollToIndex({ index: currentItemIndexRef.current, align: 'start' });
-  }, [isTwoPages]);
+    const pageIndex = pageWhenSwitching.current - firstPageNumber;
+    pageWhenSwitching.current = null;
+    virtuosoRef.current?.scrollToIndex({
+      index: isTwoPages ? getSpreadIndex(pageIndex, firstPageNumber) : pageIndex,
+      align: 'start',
+    });
+  }, [isTwoPages, isTwoPageViewReady, firstPageNumber, isQalun]);
 
   useScrollToVirtualizedVerse(
     quranReaderDataType,
@@ -230,7 +274,8 @@ const ReadingView = ({
     scrollToNextPage();
   }, [scrollToNextPage]);
 
-  const allowKeyboardNavigation = quranTextFontScale <= 5;
+  // the size being shown, not the one stored: a stored size above what fits shows smaller
+  const allowKeyboardNavigation = fontScale <= 5;
   const onUpClicked = useCallback(
     (event: KeyboardEvent) => {
       event.preventDefault();
@@ -250,25 +295,39 @@ const ReadingView = ({
   useHotkeys('Up', onUpClicked, { enabled: allowKeyboardNavigation }, [scrollToPreviousPage]);
   useHotkeys('Down', onDownClicked, { enabled: allowKeyboardNavigation }, [scrollToNextPage]);
 
-  const renderPage = (pageIndex: number) => (
-    <PageContainer
-      key={pageIndex}
-      pagesVersesRange={pagesVersesRange}
-      quranReaderStyles={pageStyles}
-      isFullPage={isTwoPages}
-      pageLines={pageLayouts?.[firstPageNumber + pageIndex]}
-      reciterId={reciterId}
-      lang={lang}
-      wordByWordLocale={wordByWordLocale}
-      pageIndex={pageIndex}
-      setMushafPageToVersesMap={setMushafPageToVersesMap}
-      initialData={initialData}
-    />
-  );
+  const renderPage = (pageIndex: number) => {
+    if (isQalun) {
+      const pageNumber = firstPageNumber + pageIndex;
+      if (pageNumber < 1 || pageNumber > MADANI_MUSHAF_PAGES) return null;
+      return (
+        <QalunPage
+          key={pageNumber}
+          pageNumber={pageNumber}
+          verseKey={pagesVersesRange[pageNumber]?.from}
+        />
+      );
+    }
+    return (
+      <PageContainer
+        key={pageIndex}
+        pagesVersesRange={pagesVersesRange}
+        quranReaderStyles={pageStyles}
+        isFullPage={isTwoPages}
+        pageLines={pageLayouts?.[firstPageNumber + pageIndex]}
+        reciterId={reciterId}
+        lang={lang}
+        wordByWordLocale={wordByWordLocale}
+        pageIndex={pageIndex}
+        setMushafPageToVersesMap={setMushafPageToVersesMap}
+        initialData={initialData}
+      />
+    );
+  };
 
   const itemContentRenderer = (itemIndex: number) => {
     if (itemIndex === itemsCount) {
-      const pageVerses = mushafPageToVersesMap[lastReadPageNumber];
+      // Qalun pages load no Quran.com verses; the surah's own verses lead to the next surah
+      const pageVerses = isQalun ? initialData.verses : mushafPageToVersesMap[lastReadPageNumber];
       const lastVerse = pageVerses?.[pageVerses.length - 1];
       if (!lastVerse) return null;
 
@@ -297,7 +356,7 @@ const ReadingView = ({
   }
 
   return (
-    <FontScaleOverrideContext.Provider value={twoPageFontScale}>
+    <FontScaleOverrideContext.Provider value={fittedFontScale}>
       <QueryParamMessage
         translationsQueryParamDifferent={false}
         reciterQueryParamDifferent={reciterQueryParamDifferent}
@@ -305,10 +364,11 @@ const ReadingView = ({
       />
       <div
         ref={containerRef}
-        onCopy={(event) => onCopyQuranWords(event, verses, quranFont)}
+        // Qalun text is plain Unicode and copies as it is
+        onCopy={isQalun ? undefined : (event) => onCopyQuranWords(event, verses, quranFont)}
         className={classNames(
           styles.container,
-          styles[getLineWidthClassName(quranFont, fontScale, mushafLines)],
+          styles[getLineWidthClassName(layoutFont, fontScale, mushafLines)],
         )}
       >
         {isLoading || !isTwoPageViewReady ? (
@@ -333,12 +393,13 @@ const ReadingView = ({
           />
         )}
       </div>
-      {allowKeyboardNavigation && (
+      {(allowKeyboardNavigation || canShowTwoPages) && (
         <PageNavigationButtons
           scrollToNextPage={onNextPageClicked}
           scrollToPreviousPage={onPrevPageClicked}
           isTwoPages={isTwoPages}
-          onToggleTwoPages={canShowTwoPages ? onToggleTwoPages : undefined}
+          onToggleTwoPages={canShowTwoPages ? onToggleTwoPagesAt : undefined}
+          isPageNavigationShown={allowKeyboardNavigation}
         />
       )}
     </FontScaleOverrideContext.Provider>

@@ -30,6 +30,7 @@ const config = {
       '!fonts/**/!(sura_names|ProximaVara)*', // exclude pre-caching all fonts that are not sura_names or ProximaVara
       '!icons/**', // exclude all icons
       '!images/**/!(background|homepage)*', // don't pre-cache except background.jpg and homepage.png
+      '!qalun/**', // Qalun pages: fetched only by readers who switch to Qalun
     ],
   },
   // this is needed to support importing audioWorklet nodes. {@see https://github.com/webpack/webpack/issues/11543#issuecomment-826897590}
@@ -103,6 +104,15 @@ const config = {
               {
                 key: 'cache-control',
                 value: 'public, max-age=31536000, immutable', // Max-age is 1 year. immutable indicates that the font will not change over the expiry time.
+              },
+            ],
+          },
+          {
+            source: '/qalun/:file*', // Qalun page files; they rarely change
+            headers: [
+              {
+                key: 'cache-control',
+                value: 'public, max-age=86400, stale-while-revalidate=604800',
               },
             ],
           },

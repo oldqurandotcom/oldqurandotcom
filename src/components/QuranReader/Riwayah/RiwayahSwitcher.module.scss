@@ -1,0 +1,6 @@
+.container {
+  max-width: calc(10 * var(--spacing-large));
+  margin-inline: auto;
+  margin-block-start: var(--spacing-small);
+  padding-inline: var(--spacing-small);
+}

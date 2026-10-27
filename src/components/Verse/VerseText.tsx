@@ -30,6 +30,8 @@ type VerseTextProps = {
   shouldShowH1ForSEO?: boolean;
   // from the mushaf page layout; when not given, the built-in list of centred lines decides
   isCentered?: boolean;
+  // whether it tells the reader's bar what's being read (not on a facing page from elsewhere)
+  isObserved?: boolean;
 };
 
 const VerseText = ({
@@ -38,9 +40,10 @@ const VerseText = ({
   isHighlighted,
   shouldShowH1ForSEO = false,
   isCentered,
+  isObserved = true,
 }: VerseTextProps) => {
   const textRef = useRef(null);
-  useIntersectionObserver(textRef, QURAN_READER_OBSERVER_ID);
+  useIntersectionObserver(isObserved ? textRef : null, QURAN_READER_OBSERVER_ID);
   const { quranFont, mushafLines } = useSelector(selectQuranReaderStyles, shallowEqual);
   const quranTextFontScale = useQuranTextFontScale();
   const [firstWord] = words;

@@ -13,6 +13,30 @@
   max-width: 100%;
 }
 
+// The default font's text sized from the page's width (--line-width), as in the two-page view
+// (see MushafPage.module.scss): every text size is then the same page scaled, with line spacing
+// that grows with the text and lines that always fit. Desktop only, where page widths are set.
+.proportional {
+  @include breakpoints.desktop {
+    --mushaf-font: calc(var(--line-width) / 15.4);
+    --mushaf-row: calc(var(--line-width) / 8.85);
+
+    [class*="verseTextContainer"] {
+      font-size: var(--mushaf-font);
+      --line-height: var(--mushaf-row);
+      line-height: var(--mushaf-row);
+    }
+
+    [class*="verseTextContainer"] * {
+      line-height: inherit;
+    }
+
+    [class*="verseTextCenterAlign"] {
+      column-gap: 0.2em;
+    }
+  }
+}
+
 .mobileCenterText {
   text-align: center;
   direction: rtl;

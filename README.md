@@ -13,8 +13,8 @@ The code is Quran.com's open-source frontend
 ([quran/quran.com-frontend-next](https://github.com/quran/quran.com-frontend-next), October 2023).
 The Quran text, translations, tafsir, recitations and design belong to Quran.com,
 Quran.Foundation and their content providers, and are loaded from Quran.com's public API and CDN.
-The page line layouts come from [QUL](https://qul.tarteel.ai) by Tarteel, and the surah heading
-font is by the King Fahd Glorious Quran Printing Complex.
+The page line layouts come from [QUL](https://qul.tarteel.ai) by Tarteel. The surah heading font,
+and the Qalun text, layout and font, are by the King Fahd Glorious Quran Printing Complex.
 
 No ads, no tracking, nothing for sale.
 
@@ -23,9 +23,14 @@ No ads, no tracking, nothing for sale.
 - **Select to loop:** select ayat, or just a few words, and press *Loop*; it repeats from the first
   selected word to the last until you press *Stop* or Esc.
 - **Two pages:** in reading view on a wide screen, with the default (Madani V1) font, the
-  open-book button (bottom right) shows full printed pages in pairs, odd page on the right, with every line, surah heading and
-  Bismillah where the printed mushaf has it (see `scripts/mushaf-lines`).
-- **Cmd/Ctrl + and −** make the Quran text bigger or smaller instead of zooming the page.
+  open-book button (bottom right) shows full printed pages in pairs, odd page on the right, with
+  every line, surah heading and Bismillah where the printed mushaf has it (see
+  `scripts/mushaf-lines`).
+- **Qalun:** the *Hafs | Qalun* switch above the reader shows the Qalun 'an Nafi' mushaf, page
+  by page and line by line as the King Fahd Complex typeset it, in one or two pages (see
+  `scripts/qalun`). It's text only: translations, word-by-word and audio are Hafs's.
+- **Cmd/Ctrl + and −** make the Quran text bigger or smaller instead of zooming the page, up to
+  the largest size whose pages fit the window.
 - **Mini Mushaf:** the current page in an always-on-top window while you work in other tabs
   (Chrome, Edge, Brave, Arc). Cmd −/+ changes the size.
 

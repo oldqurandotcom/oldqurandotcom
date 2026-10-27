@@ -29,6 +29,8 @@ export type LineProps = {
   // page layout says whether the line is centred
   isMushafLayout?: boolean;
   isCentered?: boolean;
+  // false for the lines of a facing page from outside the surah or juz being read
+  isObserved?: boolean;
 };
 
 const Line = ({
@@ -39,6 +41,7 @@ const Line = ({
   lineIndex,
   isMushafLayout = false,
   isCentered,
+  isObserved = true,
 }: LineProps) => {
   const audioService = useContext(AudioPlayerMachineContext);
   const isHighlighted = useXstateSelector(audioService, (state) => {
@@ -95,6 +98,7 @@ const Line = ({
           isHighlighted={isHighlighted}
           shouldShowH1ForSEO={pageIndex === 0 && lineIndex === 0}
           isCentered={isCentered}
+          isObserved={isObserved}
         />
       </div>
     </div>

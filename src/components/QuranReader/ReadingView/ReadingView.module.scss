@@ -30,6 +30,7 @@
   justify-content: center;
   align-items: flex-start;
   column-gap: var(--spacing-mega);
-  // when both pages don't fit (big text, narrow window), they stack like the one-page view
+  // the text size is chosen so both pages fit; on a window too narrow even for the smallest
+  // size, they stack like the one-page view
   flex-wrap: wrap;
 }

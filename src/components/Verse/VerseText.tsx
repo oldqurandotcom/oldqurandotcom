@@ -8,6 +8,7 @@ import { QURAN_READER_OBSERVER_ID } from '../QuranReader/observer';
 import isCenterAlignedPage from './pageUtils';
 import styles from './VerseText.module.scss';
 
+import { useQuranTextFontScale } from '@/components/QuranReader/contexts/FontScaleOverrideContext';
 import useIsFontLoaded from '@/components/QuranReader/hooks/useIsFontLoaded';
 import QuranWord from '@/dls/QuranWord/QuranWord';
 import useIntersectionObserver from '@/hooks/useObserveElement';
@@ -27,6 +28,8 @@ type VerseTextProps = {
   isReadingMode?: boolean;
   isHighlighted?: boolean;
   shouldShowH1ForSEO?: boolean;
+  // from the mushaf page layout; when not given, the built-in list of centred lines decides
+  isCentered?: boolean;
 };
 
 const VerseText = ({
@@ -34,13 +37,12 @@ const VerseText = ({
   isReadingMode = false,
   isHighlighted,
   shouldShowH1ForSEO = false,
+  isCentered,
 }: VerseTextProps) => {
   const textRef = useRef(null);
   useIntersectionObserver(textRef, QURAN_READER_OBSERVER_ID);
-  const { quranFont, quranTextFontScale, mushafLines } = useSelector(
-    selectQuranReaderStyles,
-    shallowEqual,
-  );
+  const { quranFont, mushafLines } = useSelector(selectQuranReaderStyles, shallowEqual);
+  const quranTextFontScale = useQuranTextFontScale();
   const [firstWord] = words;
   const { lineNumber, pageNumber, location, verseKey, hizbNumber } = firstWord;
   const isFontLoaded = useIsFontLoaded(firstWord.pageNumber, quranFont);
@@ -51,8 +53,8 @@ const VerseText = ({
   const selectedVerseKey = useSelector(selectReadingViewSelectedVerseKey, shallowEqual);
   const hoveredVerseKey = useSelector(selectReadingViewHoveredVerseKey, shallowEqual);
   const centerAlignPage = useMemo(
-    () => isCenterAlignedPage(pageNumber, lineNumber, quranFont),
-    [pageNumber, lineNumber, quranFont],
+    () => isCentered ?? isCenterAlignedPage(pageNumber, lineNumber, quranFont),
+    [isCentered, pageNumber, lineNumber, quranFont],
   );
   const firstWordData = getFirstWordOfSurah(location);
   const isTajweedFont = quranFont === QuranFont.Tajweed;

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useMemo, useRef } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -24,8 +24,9 @@ import Verse from 'types/Verse';
  *
  * @param {QuranFont} quranFont
  * @param {Verse[]} verses
+ * @param {number[]} extraPages pages to load ahead of their verses, e.g. the next pages
  */
-const useQcfFont = (quranFont: QuranFont, verses: Verse[]) => {
+const useQcfFont = (quranFont: QuranFont, verses: Verse[], extraPages: number[] = []) => {
   const currentlyFetchingFonts = useRef([]);
   const dispatch = useDispatch();
   const isFontQCF = isQCFFont(quranFont);
@@ -37,11 +38,19 @@ const useQcfFont = (quranFont: QuranFont, verses: Verse[]) => {
     [dispatch],
   );
 
+  // a page's font only needs its page number, so pages expected soon can start loading before
+  // their verses arrive
+  const pages = useMemo(
+    () =>
+      Array.from(new Set([...(verses.length > 0 ? getPagesByVerses(verses) : []), ...extraPages])),
+    [verses, extraPages],
+  );
+
   // listen to changes in verses (this is due to infinite scrolling fetching more verses).
   useEffect(() => {
-    if (isFontQCF && verses.length > 0) {
+    if (isFontQCF && pages.length > 0) {
       // loop through unique page numbers of the current verses
-      getPagesByVerses(verses).forEach((pageNumber) => {
+      pages.forEach((pageNumber) => {
         const isV1 = quranFont === QuranFont.MadaniV1;
         const fontFaceName = getFontFaceNameForPage(isV1, pageNumber);
         const fontFace = new FontFace(fontFaceName, getV1OrV2FontFaceSource(isV1, pageNumber));
@@ -70,7 +79,7 @@ const useQcfFont = (quranFont: QuranFont, verses: Verse[]) => {
         }
       });
     }
-  }, [quranFont, verses, loadedFonts, isFontQCF, currentlyFetchingFonts, onFontLoaded]);
+  }, [quranFont, pages, loadedFonts, isFontQCF, currentlyFetchingFonts, onFontLoaded]);
 };
 
 export default useQcfFont;

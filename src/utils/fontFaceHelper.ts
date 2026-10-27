@@ -33,6 +33,16 @@ export const getPagesByVerses = (verses: Verse[]): number[] => {
 // The ~600MB of per-page QCF fonts are served from Quran.com's public CDN instead of being bundled.
 const QCF_FONTS_HOST = 'https://static.qurancdn.com';
 
+/**
+ * The woff2 file of a page's QCF font, e.g. to preload it.
+ *
+ * @param {boolean} isV1
+ * @param {number} pageNumber
+ * @returns {string}
+ */
+export const getQcfFontWoff2Url = (isV1: boolean, pageNumber: number): string =>
+  `${QCF_FONTS_HOST}/fonts/quran/hafs/${isV1 ? 'v1' : 'v2'}/woff2/p${pageNumber}.woff2`;
+
 export const getV1OrV2FontFaceSource = (isV1: boolean, pageNumber: number): string => {
   const pageName = String(pageNumber).padStart(3, '0');
 

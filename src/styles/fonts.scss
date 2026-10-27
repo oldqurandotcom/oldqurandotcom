@@ -23,6 +23,16 @@
   font-display: swap;
 }
 
+// the printed mushaf's surah headings, one glyph per surah (two-page view; KFGQPC, via QUL)
+@font-face {
+  font-family: "surah-header";
+  src: url("/fonts/quran/surah-header/surah-header.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  // its glyphs are Arabic letters in other fonts, so never show them before it loads
+  font-display: block;
+}
+
 // TODO: regenerate this font and add font-family name
 @font-face {
   font-family: "surahnames";

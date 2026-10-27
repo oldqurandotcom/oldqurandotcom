@@ -15,6 +15,9 @@ class MyDocument extends Document {
       <Head>
         {/* unofficial clone: never show up in search results next to the real Quran.com */}
         <meta name="robots" content="noindex, nofollow" />
+        {/* Quran text, fonts and audio data come from Quran.com's servers: connect early */}
+        <link rel="preconnect" href="https://static.qurancdn.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.qurancdn.com" crossOrigin="anonymous" />
       </Head>
       <body>
         <Main />

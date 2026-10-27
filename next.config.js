@@ -107,6 +107,16 @@ const config = {
             ],
           },
           {
+            // the two-page view's line layouts; they rarely change
+            source: '/mushaf-lines/:file*',
+            headers: [
+              {
+                key: 'cache-control',
+                value: 'public, max-age=86400, stale-while-revalidate=604800',
+              },
+            ],
+          },
+          {
             source: '/images/:image*', // match wildcard images' path which will match any image file on any level under /images.
             headers: [
               {

@@ -25,9 +25,21 @@ export type LineProps = {
   quranReaderStyles: QuranReaderStyles;
   pageIndex: number;
   lineIndex: number;
+  // a line of a full mushaf page (two-page view): the page draws surah names itself, and the
+  // page layout says whether the line is centred
+  isMushafLayout?: boolean;
+  isCentered?: boolean;
 };
 
-const Line = ({ lineKey, words, isBigTextLayout, pageIndex, lineIndex }: LineProps) => {
+const Line = ({
+  lineKey,
+  words,
+  isBigTextLayout,
+  pageIndex,
+  lineIndex,
+  isMushafLayout = false,
+  isCentered,
+}: LineProps) => {
   const audioService = useContext(AudioPlayerMachineContext);
   const isHighlighted = useXstateSelector(audioService, (state) => {
     const { surah, ayahNumber } = state.context;
@@ -51,7 +63,8 @@ const Line = ({ lineKey, words, isBigTextLayout, pageIndex, lineIndex }: LinePro
   }, [isHighlighted, scrollToSelectedItem, enableAutoScrolling]);
 
   const firstWordData = getWordDataByLocation(words[0].location);
-  const shouldShowChapterHeader = firstWordData[1] === '1' && firstWordData[2] === '1';
+  const shouldShowChapterHeader =
+    !isMushafLayout && firstWordData[1] === '1' && firstWordData[2] === '1';
   const isWordByWordLayout = showWordByWordTranslation || showWordByWordTransliteration;
 
   return (
@@ -81,6 +94,7 @@ const Line = ({ lineKey, words, isBigTextLayout, pageIndex, lineIndex }: LinePro
           isReadingMode
           isHighlighted={isHighlighted}
           shouldShowH1ForSEO={pageIndex === 0 && lineIndex === 0}
+          isCentered={isCentered}
         />
       </div>
     </div>

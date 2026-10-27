@@ -1,0 +1,53 @@
+@use "src/styles/constants";
+
+.page {
+  margin-block-start: constants.$reading-view-container-top-margin;
+  margin-block-end: var(--spacing-mega);
+  border-block-end: 1px var(--color-borders-hairline) solid;
+}
+
+// one row per printed line; 1fr rows all grow to the tallest line, so empty and decorated
+// lines keep the page the height of the print
+.lines {
+  display: grid;
+  width: var(--line-width, auto);
+  max-width: 100%;
+}
+
+.line {
+  min-width: 0;
+}
+
+// surah names and the Bismillah are drawn to fit the line, without making it taller
+.decoratedLine {
+  position: relative;
+  container-type: size;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4cqh;
+}
+
+.surahHeader {
+  // each glyph is 3.246em wide, so this fills the line's width like the printed frame
+  font-family: "surah-header";
+  font-size: 30.8cqw;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-text-default);
+}
+
+// IndoPak 16 lines: the frame and the Bismillah share the line
+.withBismillah .surahHeader {
+  font-size: 15cqw;
+}
+
+.bismillah {
+  display: flex;
+  height: 70%;
+
+  svg {
+    height: 100%;
+    width: auto;
+  }
+}

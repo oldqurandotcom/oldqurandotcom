@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo } from 'react';
 
+import { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import { getPageNumberByPageIndex } from '../utils/page';
 
+import MushafPage from './MushafPage';
+import { MushafPageLines } from './MushafPage/useMushafLines';
 import Page from './Page';
 import ReadingViewSkeleton from './ReadingViewSkeleton';
 
 import { getReaderViewRequestKey, verseFetcher } from '@/components/QuranReader/api';
+import useIsPageFontReady from '@/components/QuranReader/hooks/useIsPageFontReady';
 import useIsUsingDefaultSettings from '@/hooks/useIsUsingDefaultSettings';
 import QuranReaderStyles from '@/redux/types/QuranReaderStyles';
 import { VersesResponse } from 'types/ApiResponses';
@@ -23,6 +27,9 @@ type Props = {
   pageIndex: number;
   setMushafPageToVersesMap: (data: Record<number, Verse[]>) => void;
   initialData: VersesResponse;
+  // two-page view: show the whole printed page, not just the part in the current surah/juz
+  isFullPage?: boolean;
+  pageLines?: MushafPageLines;
 };
 
 const getPageVersesRange = (
@@ -70,6 +77,8 @@ const PageContainer: React.FC<Props> = ({
   pageIndex,
   setMushafPageToVersesMap,
   initialData,
+  isFullPage = false,
+  pageLines,
 }: Props): JSX.Element => {
   const pageNumber = useMemo(
     () => getPageNumberByPageIndex(pageIndex, pagesVersesRange),
@@ -81,22 +90,21 @@ const PageContainer: React.FC<Props> = ({
   );
 
   const isUsingDefaultSettings = useIsUsingDefaultSettings();
-  const shouldUseInitialData = pageIndex === 0 && isUsingDefaultSettings;
-  const { data: verses, isValidating } = useSWRImmutable(
-    getReaderViewRequestKey({
-      pageNumber,
-      pageVersesRange: getPageVersesRange(pageNumber, pagesVersesRange),
-      quranReaderStyles,
-      reciter: reciterId,
-      locale: lang,
-      wordByWordLocale,
-    }),
-    verseFetcher,
-    {
-      fallbackData: shouldUseInitialData ? initialVerses : null,
-      revalidateOnMount: !shouldUseInitialData,
-    },
-  );
+  const shouldUseInitialData = !isFullPage && pageIndex === 0 && isUsingDefaultSettings;
+  const { cache } = useSWRConfig();
+  const requestKey = getReaderViewRequestKey({
+    pageNumber,
+    pageVersesRange: isFullPage ? undefined : getPageVersesRange(pageNumber, pagesVersesRange),
+    quranReaderStyles,
+    reciter: reciterId,
+    locale: lang,
+    wordByWordLocale,
+  });
+  const { data: verses, isValidating } = useSWRImmutable(requestKey, verseFetcher, {
+    fallbackData: shouldUseInitialData ? initialVerses : null,
+    // a full page fetched ahead (while the two-page view gets ready) is used as is
+    revalidateOnMount: isFullPage ? !cache.get(requestKey) : !shouldUseInitialData,
+  });
 
   useEffect(() => {
     if (verses) {
@@ -108,8 +116,24 @@ const PageContainer: React.FC<Props> = ({
     }
   }, [pageNumber, setMushafPageToVersesMap, verses]);
 
-  if (!verses || isValidating) {
+  // keep the placeholder until the page's font is in, so the text is drawn once, in its font
+  const isFontReady = useIsPageFontReady(pageNumber, quranReaderStyles.quranFont);
+
+  if (!verses || isValidating || !isFontReady) {
     return <ReadingViewSkeleton />;
+  }
+
+  if (pageLines) {
+    return (
+      <MushafPage
+        verses={verses}
+        key={`page-${pageNumber}`}
+        pageNumber={Number(pageNumber)}
+        lines={pageLines}
+        quranReaderStyles={quranReaderStyles}
+        pageIndex={pageIndex}
+      />
+    );
   }
 
   return (

@@ -3,6 +3,7 @@ import React from 'react';
 
 import classNames from 'classnames';
 import useTranslation from 'next-translate/useTranslation';
+import Head from 'next/head';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import ContextMenu from './ContextMenu';
@@ -20,8 +21,9 @@ import { selectNotes } from '@/redux/slices/QuranReader/notes';
 import { selectReadingPreference } from '@/redux/slices/QuranReader/readingPreferences';
 import { selectIsSidebarNavigationVisible } from '@/redux/slices/QuranReader/sidebarNavigation';
 import { selectQuranReaderStyles } from '@/redux/slices/QuranReader/styles';
+import { getQcfFontWoff2Url, isQCFFont } from '@/utils/fontFaceHelper';
 import { VersesResponse } from 'types/ApiResponses';
-import { QuranReaderDataType, ReadingPreference } from 'types/QuranReader';
+import { QuranFont, QuranReaderDataType, ReadingPreference } from 'types/QuranReader';
 
 type QuranReaderProps = {
   initialData: VersesResponse;
@@ -42,8 +44,21 @@ const QuranReader = ({
   const isReadingPreference = readingPreference === ReadingPreference.Reading;
   useFontSizeShortcuts();
 
+  const firstPage = initialData.verses[0]?.pageNumber;
   return (
     <>
+      {isQCFFont(quranReaderStyles.quranFont) && firstPage && (
+        <Head>
+          {/* start the first page's font with the page itself, not after its verses load */}
+          <link
+            rel="preload"
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
+            href={getQcfFontWoff2Url(quranReaderStyles.quranFont === QuranFont.MadaniV1, firstPage)}
+          />
+        </Head>
+      )}
       <FontPreLoader isQuranReader locale={lang} />
       <ContextMenu />
       <DebuggingObserverWindow isReadingMode={isReadingPreference} />
